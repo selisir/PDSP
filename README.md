@@ -13,3 +13,14 @@ aperte di notte nello stesso giorno) è la somma per ogni coppia di farmacie f,g
 quando sono vicine. Si cerca l’insieme di turni di costo minimo. Per 2 persone. Variante 1
 per 3 persone: risolvere con la generazione di colonne. Variante 2 per 3 persone: ogni
 farmacia non può fare più di k turni ogni s giorni.
+
+
+ipotesi modello matematico
+- farmacie: opz 1 variabili [0,1], opz 2 farmacie su vettore H
+- usiamo opz 2
+- es: farmacia1: [0,1,0] - la farmacia è aperta il giorno 2
+
+modello:
+- copertura: $$\forall q \forall h \exists f\left[ h \right] = 1 t.c. t_{qf} \le \sigma$$
+- fob: $$min\\left(\sum_{h=1}^{H}\left(\delta - \pi_{fg}\right)f\left[h\right]g\left[h\right]\right)$$
+- coppie vicine: 
