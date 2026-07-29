@@ -16,11 +16,13 @@ farmacia non può fare più di k turni ogni s giorni.
 
 
 ipotesi modello matematico
-- farmacie: opz 1 variabili [0,1], opz 2 farmacie su vettore H
-- usiamo opz 2
+- farmacie: variabili [0,1] su vettore H
 - es: farmacia1: [0,1,0] - la farmacia è aperta il giorno 2
+- questo semplifica il calcolo del vincolo di k turni in s giorni 
 
 modello:
 - copertura: $$\forall q \forall h \exists f\left[ h \right] = 1 t.c. t_{qf} \le \sigma$$
+- $$\sigma$$ variabile da decidere - ci precalcoliamo tutti i costi "costanti" prima del programma
+- costo: $$c: c_{fg}=\sigma - \pi_{fg}$$ se $$\exists \pi_{fg}$$, altrimenti 0
 - fob: $$min\\left(\sum_{h=1}^{H}\left(\delta - \pi_{fg}\right)f\left[h\right]g\left[h\right]\right)$$
 - coppie vicine: 
