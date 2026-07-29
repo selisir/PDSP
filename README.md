@@ -24,12 +24,20 @@ ipotesi modello matematico
 modello:
 - copertura: $$\forall q \forall h \exists f\left[ h \right] = 1 t.c. t_{qf} \le \sigma$$
 - $$\sigma$$ variabile da decidere - ci precalcoliamo tutti i costi "costanti" prima del programma
+
 - costo: $$c: c_{fg}=\sigma - \pi_{fg}$$ se $$\exists \pi_{fg}$$, altrimenti 0
 
 - FUNZIONE OBIETTIVO non linearizzata
 - fob: $$min\\left(\sum_{h=1}^{H}\left(c_{fg}\right)f\left[h\right]g\left[h\right]\right)$$
-- problema: la moltiplicazione f[h]*g[h] è costosa, possiamo usare una variabile $$var_{fg}$$ che se f[h]+g[h]-1>=1 è 1, altrimenti 0. 
-- DOMANDA: va bene?
+- problema: la moltiplicazione f[h]*g[h] è costosa, possiamo usare una variabile $$var_{fg}$$ che se f[h]+g[h]-1>=1 è 1, altrimenti 0.
+- 
+- per ogni coppia f<g, il costo deve essere positivo 
+- - il calcolo si fa se il costo c è maggiore di 0
+- ricordarsi che le coppie ordinate se ne prende solo 1
+- possiamo usare create
+- matrice dei costi: sono le variabili che costano, altrimenti dizionario
+- f e g sono indicizzate su H
+
 
 - k turni in s giorni --> k e s sono da decidere
 - usare sliding windows --> es facciamo 7 giorni, non deve superare (in 7 giorni) 4 turni 
