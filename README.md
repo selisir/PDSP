@@ -18,7 +18,8 @@ farmacia non può fare più di k turni ogni s giorni.
 ipotesi modello matematico
 - farmacie: variabili [0,1] su vettore H
 - es: farmacia1: [0,1,0] - la farmacia è aperta il giorno 2
-- questo semplifica il calcolo del vincolo di k turni in s giorni 
+- questo semplifica il calcolo del vincolo di k turni in s giorni
+- per ogni quartiere devo sapere quali sono le righe farmacia, per ogni giorno, sommando i giorni, ho almeno 1 -> quartiere mi mappa delle righe
 
 modello:
 - copertura: $$\forall q \forall h \exists f\left[ h \right] = 1 t.c. t_{qf} \le \sigma$$
