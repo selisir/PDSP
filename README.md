@@ -24,5 +24,6 @@ modello:
 - copertura: $$\forall q \forall h \exists f\left[ h \right] = 1 t.c. t_{qf} \le \sigma$$
 - $$\sigma$$ variabile da decidere - ci precalcoliamo tutti i costi "costanti" prima del programma
 - costo: $$c: c_{fg}=\sigma - \pi_{fg}$$ se $$\exists \pi_{fg}$$, altrimenti 0
-- fob: $$min\\left(\sum_{h=1}^{H}\left(\delta - \pi_{fg}\right)f\left[h\right]g\left[h\right]\right)$$
+- FUNZIONE OBIETTIVO non linearizzata
+- fob: $$min\\left(\sum_{h=1}^{H}\left(c_{fg}\right)f\left[h\right]g\left[h\right]\right)$$
 - coppie vicine: 
