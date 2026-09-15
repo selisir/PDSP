@@ -40,5 +40,7 @@ modello:
 
 
 - k turni in s giorni --> k e s sono da decidere
-- usare sliding windows --> es facciamo 7 giorni, non deve superare (in 7 giorni) 4 turni 
+- usare sliding windows --> es facciamo 7 giorni, non deve superare (in 7 giorni) 4 turni
+
+- cosa manca: file distanza farmacie, ottimizzazione sulle coppie ridondanti, file con tutti i dati 
   
