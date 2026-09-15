@@ -1,0 +1,36 @@
+! Data file for Pharmacy Duty Scheduling Problem (PDSP) - TEST RIDOTTO
+! Sottoinsieme reale dati Ferrara: 4 quartieri, 5 farmacie, sigma=1.8
+! Used for FICO Xpress Mosel
+
+! --- PARAMETERS ---
+n_giorni: 7
+n_quartieri: 4
+n_farmacie: 5
+
+sigma: 1.5
+delta: 0.1
+
+k_turni: 2
+s_giorni: 4
+
+! --- MATRICES ---
+! T_DIST: distanza quartiere q -> farmacia f (dati reali Ferrara)
+! Righe: Quartieri (1=Centro Storico, 2=Quartiere Giardino, 3=Arianuova, 4=San Giorgio)
+! Colonne: Farmacie (1=F01, 2=F09, 3=F17, 4=F21, 5=F08)
+t_dist: [
+    0.1183 0.6056 0.6561 1.7007 1.6045
+    0.9958 0.3564 0.8845 1.2067 2.4346
+    0.9326 0.5996 0.1813 0.9645 2.3309
+    1.4722 2.1629 2.1871 3.2886 0.2965
+]
+
+! PI_DIST: distanza farmacia f <-> farmacia g
+! *** PLACEHOLDER: sostituire con distanze reali (Haversine) tra le farmacie ***
+! Righe/Colonne: Farmacie (1=F01, 2=F09, 3=F17, 4=F21, 5=F08)
+pi_dist: [
+    0.0000 0.8123 2.1045 2.3012 1.9087
+    0.8123 0.0000 3.6210 1.8034 2.7098
+    2.1045 3.6210 0.0000 1.4056 2.5011
+    2.3012 1.8034 1.4056 0.0000 6.6045
+    1.9087 2.7098 2.5011 6.6045 0.0000
+]
