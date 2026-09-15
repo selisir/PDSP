@@ -4,7 +4,7 @@ uses "mmxprs"
 ! =========================================================================
 ! BLOCCO 1: dimensioni e parametri scalari
 ! Devono essere dichiarati e CARICATI PRIMA di dichiarare qualunque array
-! che dipenda da Q, F, H — altrimenti quegli array vengono creati con
+! che dipenda da Q, F, H â€” altrimenti quegli array vengono creati con
 ! dimensione 0 e tutti i vincoli che li usano risultano vuoti/errati.
 ! =========================================================================
 declarations
@@ -13,7 +13,7 @@ declarations
     n_giorni: integer
 
     sigma: real       ! Raggio massimo di copertura quartiere-farmacia
-    delta: real       ! Raggio massimo di vicinanza farmacia-farmacia (penalità)
+    delta: real       ! Raggio massimo di vicinanza farmacia-farmacia (penalitÃ )
     k_turni: integer  ! Numero massimo di turni consentiti...
     s_giorni: integer ! ...in una finestra di s giorni
                        ! NOTA: per il modello BASE (2 persone, vincolo "non piu'
@@ -77,6 +77,19 @@ forall(f, g in F | f < g) do
     end-if
 end-do
 
+! --- STAMPA COPPIE DI FARMACIE CON COSTO > 0 ---
+writeln("\n--- COPPIE CON PENALITA' DI VICINANZA (costo > 0) ---")
+n_coppie := 0
+
+forall(f, g in F | f < g and costo(f,g) > 0) do
+    writeln("Coppia (F", f, ", F", g, ") -> Distanza: ", pi_dist(f,g), " km | Costo: ", costo(f,g))
+    n_coppie += 1
+end-do
+
+if n_coppie = 0 then
+    writeln("Nessuna coppia di farmacie si trova a distanza inferiore a delta (", delta, " km).")
+end-if
+
 ! --- VARIABILI E DOMINI ---
 
 forall(f in F, h in H) x(f,h) is_binary
@@ -97,10 +110,15 @@ end-do
 
 ! 2. Turnistica (sliding window): al massimo k_turni turni in ogni finestra
 !    di s_giorni consecutivi. Con s_giorni = n_giorni si ottiene il vincolo
-!    "totale" del modello base a 2 persone; con s_giorni < n_giorni si ottiene
+!    "totale" del modello base, con s_giorni < n_giorni si ottiene
 !    la Variante 2.
-forall(f in F, inizio in 1..(n_giorni - s_giorni + 1)) do
-    sum(h in inizio..(inizio + s_giorni - 1)) x(f,h) <= k_turni
+!forall(f in F, inizio in 1..(n_giorni - s_giorni + 1)) do
+!    sum(h in inizio..(inizio + s_giorni - 1)) x(f,h) <= k_turni
+!end-do
+
+! 2. Turnistica globale: al massimo k_turni per ciascuna farmacia nell'intero orizzonte H
+forall(f in F) do
+    sum(h in H) x(f,h) <= k_turni
 end-do
 
 ! 3. Linearizzazione AND: y(f,g,h) >= 1 solo se f e g sono ENTRAMBE aperte
@@ -116,8 +134,23 @@ F_Obiettivo := sum(f, g in F, h in H | f < g and costo(f,g) > 0) (costo(f,g) * y
 
 minimize(F_Obiettivo)
 
+! --- STAMPA COPERTURA QUARTIERI ---
+writeln("\n--- COPERTURA PER QUARTIERE ---")
+forall(q in Q) do
+    write("Q", q, " -> ")
+    n_aperte := 0
+    forall(f in F | copertura(q,f) = 1) do
+        if n_aperte > 0 then
+            write(", ")
+        end-if
+        write("F", f)
+        n_aperte += 1
+    end-do
+    writeln("")
+end-do
+
 ! --- STAMPA RISULTATI ---
-writeln("--- RISULTATI OTTIMIZZAZIONE ---")
+writeln("\n--- RISULTATI OTTIMIZZAZIONE ---")
 writeln("Status Soluzione: ", getprobstat)
 writeln("Costo Totale (Funzione Obiettivo): ", getobjval)
 writeln("")
