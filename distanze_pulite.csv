@@ -1,0 +1,379 @@
+id_1,nome_1,id_2,nome_2,distanza_km
+F01,Farmacia Comunale 1 – Piazza Municipio,F02,Farmacia Comunale 2 – Via Bologna,1.334236381622919
+F01,Farmacia Comunale 1 – Piazza Municipio,F03,Farmacia Comunale 3 – Via Modena,1.8755003834031907
+F01,Farmacia Comunale 1 – Piazza Municipio,F04,Farmacia Andreotti – Corso Giovecca,0.288954371384238
+F01,Farmacia Comunale 1 – Piazza Municipio,F05,Farmacia Bagni – Via Garibaldi,0.2251600056707184
+F01,Farmacia Comunale 1 – Piazza Municipio,F06,Farmacia Bonora – Via Cavour,0.3888025465025841
+F01,Farmacia Comunale 1 – Piazza Municipio,F07,Farmacia Caleffi – Via Rampari,0.9132211131910803
+F01,Farmacia Comunale 1 – Piazza Municipio,F08,Farmacia Casetti – Viale Po,1.4872767412359005
+F01,Farmacia Comunale 1 – Piazza Municipio,F09,Farmacia Dallari – Via Ariosto,0.7184023966116873
+F01,Farmacia Comunale 1 – Piazza Municipio,F10,Farmacia Del Dosso – Via Darsena,1.547195768855968
+F01,Farmacia Comunale 1 – Piazza Municipio,F11,Farmacia Fantoni – Via Comacchio,2.255976245205644
+F01,Farmacia Comunale 1 – Piazza Municipio,F12,Farmacia Forti – Corso Porta Reno,0.5611189782291715
+F01,Farmacia Comunale 1 – Piazza Municipio,F13,Farmacia Frizzi – Via Frizzi,1.017387943709428
+F01,Farmacia Comunale 1 – Piazza Municipio,F14,Farmacia Mastellari – Via Ripagrande,1.137436634098517
+F01,Farmacia Comunale 1 – Piazza Municipio,F15,Farmacia Mazzini – Piazza Mazzini,0.6815895088192375
+F01,Farmacia Comunale 1 – Piazza Municipio,F16,Farmacia Modonesi – Via Palestro,1.5434841122752925
+F01,Farmacia Comunale 1 – Piazza Municipio,F17,Farmacia Paolini – Via Porta San Pietro,0.7587520307815929
+F01,Farmacia Comunale 1 – Piazza Municipio,F18,Farmacia Raveri – Via Ravenna,2.1864213896966684
+F01,Farmacia Comunale 1 – Piazza Municipio,F19,Farmacia Riminaldi – Viale Cavour,0.1225240265871743
+F01,Farmacia Comunale 1 – Piazza Municipio,F20,Farmacia Rinaldi – Via Kennedy,2.068432930149575
+F01,Farmacia Comunale 1 – Piazza Municipio,F21,Farmacia Rossi – Via Piangipane,1.818041585707067
+F01,Farmacia Comunale 1 – Piazza Municipio,F22,Farmacia Samaritana – Piazza Ariostea,0.8546607869963522
+F01,Farmacia Comunale 1 – Piazza Municipio,F23,Farmacia Sant'Anna – Via Boschetto,2.0736059243453853
+F01,Farmacia Comunale 1 – Piazza Municipio,F24,Farmacia Scandurra – Via Porta Mare,0.5308300510759975
+F01,Farmacia Comunale 1 – Piazza Municipio,F25,Farmacia Tondini – Via Ferrarese,1.6744692467314377
+F01,Farmacia Comunale 1 – Piazza Municipio,F26,Farmacia Ventura – Via Pontegradella,1.912617776692472
+F01,Farmacia Comunale 1 – Piazza Municipio,F27,Farmacia Vigna – Viale Risorgimento,0.3014899423196722
+F01,Farmacia Comunale 1 – Piazza Municipio,F28,Farmacia Zanella – Via Boccaleone,2.5460123878710466
+F02,Farmacia Comunale 2 – Via Bologna,F03,Farmacia Comunale 3 – Via Modena,1.0776315644543408
+F02,Farmacia Comunale 2 – Via Bologna,F04,Farmacia Andreotti – Corso Giovecca,1.6147305234771026
+F02,Farmacia Comunale 2 – Via Bologna,F05,Farmacia Bagni – Via Garibaldi,1.1099776957956564
+F02,Farmacia Comunale 2 – Via Bologna,F06,Farmacia Bonora – Via Cavour,1.0937845485508508
+F02,Farmacia Comunale 2 – Via Bologna,F07,Farmacia Caleffi – Via Rampari,2.232946171355573
+F02,Farmacia Comunale 2 – Via Bologna,F08,Farmacia Casetti – Viale Po,2.142132156444467
+F02,Farmacia Comunale 2 – Via Bologna,F09,Farmacia Dallari – Via Ariosto,1.322271523794234
+F02,Farmacia Comunale 2 – Via Bologna,F10,Farmacia Del Dosso – Via Darsena,2.875181213534443
+F02,Farmacia Comunale 2 – Via Bologna,F11,Farmacia Fantoni – Via Comacchio,3.5831121267223085
+F02,Farmacia Comunale 2 – Via Bologna,F12,Farmacia Forti – Corso Porta Reno,1.7407480740798629
+F02,Farmacia Comunale 2 – Via Bologna,F13,Farmacia Frizzi – Via Frizzi,0.3544316894922646
+F02,Farmacia Comunale 2 – Via Bologna,F14,Farmacia Mastellari – Via Ripagrande,2.4284697076098487
+F02,Farmacia Comunale 2 – Via Bologna,F15,Farmacia Mazzini – Piazza Mazzini,0.7552490205457703
+F02,Farmacia Comunale 2 – Via Bologna,F16,Farmacia Modonesi – Via Palestro,2.679718996332757
+F02,Farmacia Comunale 2 – Via Bologna,F17,Farmacia Paolini – Via Porta San Pietro,1.808828037170949
+F02,Farmacia Comunale 2 – Via Bologna,F18,Farmacia Raveri – Via Ravenna,3.1300905495302747
+F02,Farmacia Comunale 2 – Via Bologna,F19,Farmacia Riminaldi – Viale Cavour,1.378793946162117
+F02,Farmacia Comunale 2 – Via Bologna,F20,Farmacia Rinaldi – Via Kennedy,0.7821563698452589
+F02,Farmacia Comunale 2 – Via Bologna,F21,Farmacia Rossi – Via Piangipane,2.3740814523104743
+F02,Farmacia Comunale 2 – Via Bologna,F22,Farmacia Samaritana – Piazza Ariostea,2.1776899667902443
+F02,Farmacia Comunale 2 – Via Bologna,F23,Farmacia Sant'Anna – Via Boschetto,0.8202304698225318
+F02,Farmacia Comunale 2 – Via Bologna,F24,Farmacia Scandurra – Via Porta Mare,1.4074367577364453
+F02,Farmacia Comunale 2 – Via Bologna,F25,Farmacia Tondini – Via Ferrarese,1.9016948085609144
+F02,Farmacia Comunale 2 – Via Bologna,F26,Farmacia Ventura – Via Pontegradella,1.6717994365171285
+F02,Farmacia Comunale 2 – Via Bologna,F27,Farmacia Vigna – Viale Risorgimento,1.1123331690841125
+F02,Farmacia Comunale 2 – Via Bologna,F28,Farmacia Zanella – Via Boccaleone,2.7998447277768848
+F03,Farmacia Comunale 3 – Via Modena,F04,Farmacia Andreotti – Corso Giovecca,2.1508549333964475
+F03,Farmacia Comunale 3 – Via Modena,F05,Farmacia Bagni – Via Garibaldi,1.6833657320494368
+F03,Farmacia Comunale 3 – Via Modena,F06,Farmacia Bonora – Via Cavour,1.8423396053779173
+F03,Farmacia Comunale 3 – Via Modena,F07,Farmacia Caleffi – Via Rampari,2.747647619089016
+F03,Farmacia Comunale 3 – Via Modena,F08,Farmacia Casetti – Viale Po,1.8214653472641265
+F03,Farmacia Comunale 3 – Via Modena,F09,Farmacia Dallari – Via Ariosto,2.2024456453039742
+F03,Farmacia Comunale 3 – Via Modena,F10,Farmacia Del Dosso – Via Darsena,3.331144673074487
+F03,Farmacia Comunale 3 – Via Modena,F11,Farmacia Fantoni – Via Comacchio,4.019961856356226
+F03,Farmacia Comunale 3 – Via Modena,F12,Farmacia Forti – Corso Porta Reno,1.998367237424788
+F03,Farmacia Comunale 3 – Via Modena,F13,Farmacia Frizzi – Via Frizzi,1.3114800263776765
+F03,Farmacia Comunale 3 – Via Modena,F14,Farmacia Mastellari – Via Ripagrande,2.6852037914573854
+F03,Farmacia Comunale 3 – Via Modena,F15,Farmacia Mazzini – Piazza Mazzini,1.214381320577422
+F03,Farmacia Comunale 3 – Via Modena,F16,Farmacia Modonesi – Via Palestro,2.6812258447681394
+F03,Farmacia Comunale 3 – Via Modena,F17,Farmacia Paolini – Via Porta San Pietro,2.5663605346744287
+F03,Farmacia Comunale 3 – Via Modena,F18,Farmacia Raveri – Via Ravenna,2.866585317771793
+F03,Farmacia Comunale 3 – Via Modena,F19,Farmacia Riminaldi – Viale Cavour,1.8468182650569944
+F03,Farmacia Comunale 3 – Via Modena,F20,Farmacia Rinaldi – Via Kennedy,0.8724585168621856
+F03,Farmacia Comunale 3 – Via Modena,F21,Farmacia Rossi – Via Piangipane,3.358096042578242
+F03,Farmacia Comunale 3 – Via Modena,F22,Farmacia Samaritana – Piazza Ariostea,2.543395916846654
+F03,Farmacia Comunale 3 – Via Modena,F23,Farmacia Sant'Anna – Via Boschetto,1.5699518680317663
+F03,Farmacia Comunale 3 – Via Modena,F24,Farmacia Scandurra – Via Porta Mare,1.608111256269155
+F03,Farmacia Comunale 3 – Via Modena,F25,Farmacia Tondini – Via Ferrarese,2.9409341891416805
+F03,Farmacia Comunale 3 – Via Modena,F26,Farmacia Ventura – Via Pontegradella,0.8061040680671078
+F03,Farmacia Comunale 3 – Via Modena,F27,Farmacia Vigna – Viale Risorgimento,1.8067027166579832
+F03,Farmacia Comunale 3 – Via Modena,F28,Farmacia Zanella – Via Boccaleone,2.0352649215484098
+F04,Farmacia Andreotti – Corso Giovecca,F05,Farmacia Bagni – Via Garibaldi,0.511933144740771
+F04,Farmacia Andreotti – Corso Giovecca,F06,Farmacia Bonora – Via Cavour,0.5884620178535661
+F04,Farmacia Andreotti – Corso Giovecca,F07,Farmacia Caleffi – Via Rampari,0.6245381360066773
+F04,Farmacia Andreotti – Corso Giovecca,F08,Farmacia Casetti – Viale Po,1.5476977502819975
+F04,Farmacia Andreotti – Corso Giovecca,F09,Farmacia Dallari – Via Ariosto,0.7803403784608138
+F04,Farmacia Andreotti – Corso Giovecca,F10,Farmacia Del Dosso – Via Darsena,1.2614811088242033
+F04,Farmacia Andreotti – Corso Giovecca,F11,Farmacia Fantoni – Via Comacchio,1.970132715729024
+F04,Farmacia Andreotti – Corso Giovecca,F12,Farmacia Forti – Corso Porta Reno,0.519539858877842
+F04,Farmacia Andreotti – Corso Giovecca,F13,Farmacia Frizzi – Via Frizzi,1.288117197441413
+F04,Farmacia Andreotti – Corso Giovecca,F14,Farmacia Mastellari – Via Ripagrande,0.9226118189671776
+F04,Farmacia Andreotti – Corso Giovecca,F15,Farmacia Mazzini – Piazza Mazzini,0.9687261718717516
+F04,Farmacia Andreotti – Corso Giovecca,F16,Farmacia Modonesi – Via Palestro,1.4126969229655393
+F04,Farmacia Andreotti – Corso Giovecca,F17,Farmacia Paolini – Via Porta San Pietro,0.6037945537860993
+F04,Farmacia Andreotti – Corso Giovecca,F18,Farmacia Raveri – Via Ravenna,2.1131876774647607
+F04,Farmacia Andreotti – Corso Giovecca,F19,Farmacia Riminaldi – Viale Cavour,0.3067417052340756
+F04,Farmacia Andreotti – Corso Giovecca,F20,Farmacia Rinaldi – Via Kennedy,2.355994683877071
+F04,Farmacia Andreotti – Corso Giovecca,F21,Farmacia Rossi – Via Piangipane,1.731459274485034
+F04,Farmacia Andreotti – Corso Giovecca,F22,Farmacia Samaritana – Piazza Ariostea,0.6121097075041119
+F04,Farmacia Andreotti – Corso Giovecca,F23,Farmacia Sant'Anna – Via Boschetto,2.33357496435753
+F04,Farmacia Andreotti – Corso Giovecca,F24,Farmacia Scandurra – Via Porta Mare,0.6805312944766707
+F04,Farmacia Andreotti – Corso Giovecca,F25,Farmacia Tondini – Via Ferrarese,1.6851908381653613
+F04,Farmacia Andreotti – Corso Giovecca,F26,Farmacia Ventura – Via Pontegradella,2.1315546020433707
+F04,Farmacia Andreotti – Corso Giovecca,F27,Farmacia Vigna – Viale Risorgimento,0.5276594450500142
+F04,Farmacia Andreotti – Corso Giovecca,F28,Farmacia Zanella – Via Boccaleone,2.6536819374305542
+F05,Farmacia Bagni – Via Garibaldi,F06,Farmacia Bonora – Via Cavour,0.2971838847077058
+F05,Farmacia Bagni – Via Garibaldi,F07,Farmacia Caleffi – Via Rampari,1.136353856429562
+F05,Farmacia Bagni – Via Garibaldi,F08,Farmacia Casetti – Viale Po,1.5195536520508004
+F05,Farmacia Bagni – Via Garibaldi,F09,Farmacia Dallari – Via Ariosto,0.7070519561051973
+F05,Farmacia Bagni – Via Garibaldi,F10,Farmacia Del Dosso – Via Darsena,1.7721051060978703
+F05,Farmacia Bagni – Via Garibaldi,F11,Farmacia Fantoni – Via Comacchio,2.480894927746428
+F05,Farmacia Bagni – Via Garibaldi,F12,Farmacia Forti – Corso Porta Reno,0.7118649271715818
+F05,Farmacia Bagni – Via Garibaldi,F13,Farmacia Frizzi – Via Frizzi,0.7990455658865782
+F05,Farmacia Bagni – Via Garibaldi,F14,Farmacia Mastellari – Via Ripagrande,1.3431437803884712
+F05,Farmacia Bagni – Via Garibaldi,F15,Farmacia Mazzini – Piazza Mazzini,0.4731518894268451
+F05,Farmacia Bagni – Via Garibaldi,F16,Farmacia Modonesi – Via Palestro,1.7035712138638788
+F05,Farmacia Bagni – Via Garibaldi,F17,Farmacia Paolini – Via Porta San Pietro,0.8973875740458046
+F05,Farmacia Bagni – Via Garibaldi,F18,Farmacia Raveri – Via Ravenna,2.3040764604378228
+F05,Farmacia Bagni – Via Garibaldi,F19,Farmacia Riminaldi – Viale Cavour,0.2815326782999462
+F05,Farmacia Bagni – Via Garibaldi,F20,Farmacia Rinaldi – Via Kennedy,1.844098956827332
+F05,Farmacia Bagni – Via Garibaldi,F21,Farmacia Rossi – Via Piangipane,1.8748141108686665
+F05,Farmacia Bagni – Via Garibaldi,F22,Farmacia Samaritana – Piazza Ariostea,1.0723971625641544
+F05,Farmacia Bagni – Via Garibaldi,F23,Farmacia Sant'Anna – Via Boschetto,1.8593634125732488
+F05,Farmacia Bagni – Via Garibaldi,F24,Farmacia Scandurra – Via Porta Mare,0.5471585097586767
+F05,Farmacia Bagni – Via Garibaldi,F25,Farmacia Tondini – Via Ferrarese,1.6588603448129515
+F05,Farmacia Bagni – Via Garibaldi,F26,Farmacia Ventura – Via Pontegradella,1.7900103212175982
+F05,Farmacia Bagni – Via Garibaldi,F27,Farmacia Vigna – Viale Risorgimento,0.2044744188218835
+F05,Farmacia Bagni – Via Garibaldi,F28,Farmacia Zanella – Via Boccaleone,2.5235689162327706
+F06,Farmacia Bonora – Via Cavour,F07,Farmacia Caleffi – Via Rampari,1.166096898910674
+F06,Farmacia Bonora – Via Cavour,F08,Farmacia Casetti – Viale Po,1.8147439598245
+F06,Farmacia Bonora – Via Cavour,F09,Farmacia Dallari – Via Ariosto,0.4199184372915428
+F06,Farmacia Bonora – Via Cavour,F10,Farmacia Del Dosso – Via Darsena,1.8105218198616484
+F06,Farmacia Bonora – Via Cavour,F11,Farmacia Fantoni – Via Comacchio,2.512390955094507
+F06,Farmacia Bonora – Via Cavour,F12,Farmacia Forti – Corso Porta Reno,0.9484635722537024
+F06,Farmacia Bonora – Via Cavour,F13,Farmacia Frizzi – Via Frizzi,0.7450240817957802
+F06,Farmacia Bonora – Via Cavour,F14,Farmacia Mastellari – Via Ripagrande,1.502284808645303
+F06,Farmacia Bonora – Via Cavour,F15,Farmacia Mazzini – Piazza Mazzini,0.6451233780193011
+F06,Farmacia Bonora – Via Cavour,F16,Farmacia Modonesi – Via Palestro,1.9320939697065111
+F06,Farmacia Bonora – Via Cavour,F17,Farmacia Paolini – Via Porta San Pietro,0.7379604376354227
+F06,Farmacia Bonora – Via Cavour,F18,Farmacia Raveri – Via Ravenna,2.568691297121663
+F06,Farmacia Bonora – Via Cavour,F19,Farmacia Riminaldi – Viale Cavour,0.5016544653311323
+F06,Farmacia Bonora – Via Cavour,F20,Farmacia Rinaldi – Via Kennedy,1.8678415936483852
+F06,Farmacia Bonora – Via Cavour,F21,Farmacia Rossi – Via Piangipane,1.605866118778273
+F06,Farmacia Bonora – Via Cavour,F22,Farmacia Samaritana – Piazza Ariostea,1.1995685205586666
+F06,Farmacia Bonora – Via Cavour,F23,Farmacia Sant'Anna – Via Boschetto,1.758741587485452
+F06,Farmacia Bonora – Via Cavour,F24,Farmacia Scandurra – Via Porta Mare,0.8408717477901091
+F06,Farmacia Bonora – Via Cavour,F25,Farmacia Tondini – Via Ferrarese,1.3631133186400233
+F06,Farmacia Bonora – Via Cavour,F26,Farmacia Ventura – Via Pontegradella,2.039981423017508
+F06,Farmacia Bonora – Via Cavour,F27,Farmacia Vigna – Viale Risorgimento,0.0964814925377102
+F06,Farmacia Bonora – Via Cavour,F28,Farmacia Zanella – Via Boccaleone,2.817904591681585
+F07,Farmacia Caleffi – Via Rampari,F08,Farmacia Casetti – Viale Po,1.8068632759846863
+F07,Farmacia Caleffi – Via Rampari,F09,Farmacia Dallari – Via Ariosto,1.194387421207392
+F07,Farmacia Caleffi – Via Rampari,F10,Farmacia Del Dosso – Via Darsena,0.644879720686545
+F07,Farmacia Caleffi – Via Rampari,F11,Farmacia Fantoni – Via Comacchio,1.3506038909163476
+F07,Farmacia Caleffi – Via Rampari,F12,Farmacia Forti – Corso Porta Reno,0.8423071924502393
+F07,Farmacia Caleffi – Via Rampari,F13,Farmacia Frizzi – Via Frizzi,1.898124371006092
+F07,Farmacia Caleffi – Via Rampari,F14,Farmacia Mastellari – Via Ripagrande,0.6493360886759771
+F07,Farmacia Caleffi – Via Rampari,F15,Farmacia Mazzini – Piazza Mazzini,1.5891927666707468
+F07,Farmacia Caleffi – Via Rampari,F16,Farmacia Modonesi – Via Palestro,1.28281918478255
+F07,Farmacia Caleffi – Via Rampari,F17,Farmacia Paolini – Via Porta San Pietro,0.7182544418911059
+F07,Farmacia Caleffi – Via Rampari,F18,Farmacia Raveri – Via Ravenna,2.054361391924848
+F07,Farmacia Caleffi – Via Rampari,F19,Farmacia Riminaldi – Viale Cavour,0.9094137912583372
+F07,Farmacia Caleffi – Via Rampari,F20,Farmacia Rinaldi – Via Kennedy,2.980145968702092
+F07,Farmacia Caleffi – Via Rampari,F21,Farmacia Rossi – Via Piangipane,1.736470582128397
+F07,Farmacia Caleffi – Via Rampari,F22,Farmacia Samaritana – Piazza Ariostea,0.3892014943421863
+F07,Farmacia Caleffi – Via Rampari,F23,Farmacia Sant'Anna – Via Boschetto,2.924312545241427
+F07,Farmacia Caleffi – Via Rampari,F24,Farmacia Scandurra – Via Porta Mare,1.179775331445473
+F07,Farmacia Caleffi – Via Rampari,F25,Farmacia Tondini – Via Ferrarese,1.8966638368168556
+F07,Farmacia Caleffi – Via Rampari,F26,Farmacia Ventura – Via Pontegradella,2.6341476082323028
+F07,Farmacia Caleffi – Via Rampari,F27,Farmacia Vigna – Viale Risorgimento,1.1266220339007784
+F07,Farmacia Caleffi – Via Rampari,F28,Farmacia Zanella – Via Boccaleone,2.9433007096062487
+F08,Farmacia Casetti – Viale Po,F09,Farmacia Dallari – Via Ariosto,2.20100497661999
+F08,Farmacia Casetti – Viale Po,F10,Farmacia Del Dosso – Via Darsena,2.125906243879097
+F08,Farmacia Casetti – Viale Po,F11,Farmacia Fantoni – Via Comacchio,2.6762781477954256
+F08,Farmacia Casetti – Viale Po,F12,Farmacia Forti – Corso Porta Reno,1.03992613421372
+F08,Farmacia Casetti – Viale Po,F13,Farmacia Frizzi – Via Frizzi,2.025996602435165
+F08,Farmacia Casetti – Viale Po,F14,Farmacia Mastellari – Via Ripagrande,1.3436276969768328
+F08,Farmacia Casetti – Viale Po,F15,Farmacia Mazzini – Piazza Mazzini,1.4745393185083149
+F08,Farmacia Casetti – Viale Po,F16,Farmacia Modonesi – Via Palestro,1.0001144797197845
+F08,Farmacia Casetti – Viale Po,F17,Farmacia Paolini – Via Porta San Pietro,2.150381963241222
+F08,Farmacia Casetti – Viale Po,F18,Farmacia Raveri – Via Ravenna,1.0490887947536651
+F08,Farmacia Casetti – Viale Po,F19,Farmacia Riminaldi – Viale Cavour,1.36688165107881
+F08,Farmacia Casetti – Viale Po,F20,Farmacia Rinaldi – Via Kennedy,2.533550173811141
+F08,Farmacia Casetti – Viale Po,F21,Farmacia Rossi – Via Piangipane,3.276710311243733
+F08,Farmacia Casetti – Viale Po,F22,Farmacia Samaritana – Piazza Ariostea,1.4320066295647078
+F08,Farmacia Casetti – Viale Po,F23,Farmacia Sant'Anna – Via Boschetto,2.951662043895358
+F08,Farmacia Casetti – Viale Po,F24,Farmacia Scandurra – Via Porta Mare,0.9741028295581072
+F08,Farmacia Casetti – Viale Po,F25,Farmacia Tondini – Via Ferrarese,3.1599574833244897
+F08,Farmacia Casetti – Viale Po,F26,Farmacia Ventura – Via Pontegradella,1.2254095420069726
+F08,Farmacia Casetti – Viale Po,F27,Farmacia Vigna – Viale Risorgimento,1.7190622162259594
+F08,Farmacia Casetti – Viale Po,F28,Farmacia Zanella – Via Boccaleone,1.136846587565709
+F09,Farmacia Dallari – Via Ariosto,F10,Farmacia Del Dosso – Via Darsena,1.8052892427746448
+F09,Farmacia Dallari – Via Ariosto,F11,Farmacia Fantoni – Via Comacchio,2.474039522917315
+F09,Farmacia Dallari – Via Ariosto,F12,Farmacia Forti – Corso Porta Reno,1.2562815787134798
+F09,Farmacia Dallari – Via Ariosto,F13,Farmacia Frizzi – Via Frizzi,0.9730145472026718
+F09,Farmacia Dallari – Via Ariosto,F14,Farmacia Mastellari – Via Ripagrande,1.6789880366354948
+F09,Farmacia Dallari – Via Ariosto,F15,Farmacia Mazzini – Piazza Mazzini,1.043807920331153
+F09,Farmacia Dallari – Via Ariosto,F16,Farmacia Modonesi – Via Palestro,2.1929233157848227
+F09,Farmacia Dallari – Via Ariosto,F17,Farmacia Paolini – Via Porta San Pietro,0.5487000291883413
+F09,Farmacia Dallari – Via Ariosto,F18,Farmacia Raveri – Via Ravenna,2.880850367881182
+F09,Farmacia Dallari – Via Ariosto,F19,Farmacia Riminaldi – Viale Cavour,0.8408430045444872
+F09,Farmacia Dallari – Via Ariosto,F20,Farmacia Rinaldi – Via Kennedy,2.10169513112804
+F09,Farmacia Dallari – Via Ariosto,F21,Farmacia Rossi – Via Piangipane,1.1912624775731984
+F09,Farmacia Dallari – Via Ariosto,F22,Farmacia Samaritana – Piazza Ariostea,1.3536759337511082
+F09,Farmacia Dallari – Via Ariosto,F23,Farmacia Sant'Anna – Via Boschetto,1.8378718033265085
+F09,Farmacia Dallari – Via Ariosto,F24,Farmacia Scandurra – Via Porta Mare,1.230890877794565
+F09,Farmacia Dallari – Via Ariosto,F25,Farmacia Tondini – Via Ferrarese,0.9592819826396956
+F09,Farmacia Dallari – Via Ariosto,F26,Farmacia Ventura – Via Pontegradella,2.453597260139281
+F09,Farmacia Dallari – Via Ariosto,F27,Farmacia Vigna – Viale Risorgimento,0.5037697815444999
+F09,Farmacia Dallari – Via Ariosto,F28,Farmacia Zanella – Via Boccaleone,3.22984276889459
+F10,Farmacia Del Dosso – Via Darsena,F11,Farmacia Fantoni – Via Comacchio,0.7087898328259714
+F10,Farmacia Del Dosso – Via Darsena,F12,Farmacia Forti – Corso Porta Reno,1.3462318602831862
+F10,Farmacia Del Dosso – Via Darsena,F13,Farmacia Frizzi – Via Frizzi,2.5424869143562656
+F10,Farmacia Del Dosso – Via Darsena,F14,Farmacia Mastellari – Via Ripagrande,0.7823476524423351
+F10,Farmacia Del Dosso – Via Darsena,F15,Farmacia Mazzini – Piazza Mazzini,2.2116894644367084
+F10,Farmacia Del Dosso – Via Darsena,F16,Farmacia Modonesi – Via Palestro,1.317062336533597
+F10,Farmacia Del Dosso – Via Darsena,F17,Farmacia Paolini – Via Porta San Pietro,1.2809224987827694
+F10,Farmacia Del Dosso – Via Darsena,F18,Farmacia Raveri – Via Ravenna,2.048182488958393
+F10,Farmacia Del Dosso – Via Darsena,F19,Farmacia Riminaldi – Viale Cavour,1.5278680492449754
+F10,Farmacia Del Dosso – Via Darsena,F20,Farmacia Rinaldi – Via Kennedy,3.615220100295183
+F10,Farmacia Del Dosso – Via Darsena,F21,Farmacia Rossi – Via Piangipane,2.0807686482409835
+F10,Farmacia Del Dosso – Via Darsena,F22,Farmacia Samaritana – Piazza Ariostea,0.7941639439452618
+F10,Farmacia Del Dosso – Via Darsena,F23,Farmacia Sant'Anna – Via Boschetto,3.5678945493231318
+F10,Farmacia Del Dosso – Via Darsena,F24,Farmacia Scandurra – Via Porta Mare,1.7276714822379242
+F10,Farmacia Del Dosso – Via Darsena,F25,Farmacia Tondini – Via Ferrarese,2.3756054214098614
+F10,Farmacia Del Dosso – Via Darsena,F26,Farmacia Ventura – Via Pontegradella,3.1236941839371526
+F10,Farmacia Del Dosso – Via Darsena,F27,Farmacia Vigna – Viale Risorgimento,1.7713169278044527
+F10,Farmacia Del Dosso – Via Darsena,F28,Farmacia Zanella – Via Boccaleone,3.2246528726922854
+F11,Farmacia Fantoni – Via Comacchio,F12,Farmacia Forti – Corso Porta Reno,2.023145024975463
+F11,Farmacia Fantoni – Via Comacchio,F13,Farmacia Frizzi – Via Frizzi,3.248496864186164
+F11,Farmacia Fantoni – Via Comacchio,F14,Farmacia Mastellari – Via Ripagrande,1.3761958142127009
+F11,Farmacia Fantoni – Via Comacchio,F15,Farmacia Mazzini – Piazza Mazzini,2.918390486098438
+F11,Farmacia Fantoni – Via Comacchio,F16,Farmacia Modonesi – Via Palestro,1.7396768527285518
+F11,Farmacia Fantoni – Via Comacchio,F17,Farmacia Paolini – Via Porta San Pietro,1.9321412738022696
+F11,Farmacia Fantoni – Via Comacchio,F18,Farmacia Raveri – Via Ravenna,2.3470441980897903
+F11,Farmacia Fantoni – Via Comacchio,F19,Farmacia Riminaldi – Viale Cavour,2.2349125583745795
+F11,Farmacia Fantoni – Via Comacchio,F20,Farmacia Rinaldi – Via Kennedy,4.323845081421111
+F11,Farmacia Fantoni – Via Comacchio,F21,Farmacia Rossi – Via Piangipane,2.532459702713238
+F11,Farmacia Fantoni – Via Comacchio,F22,Farmacia Samaritana – Piazza Ariostea,1.476988580098183
+F11,Farmacia Fantoni – Via Comacchio,F23,Farmacia Sant'Anna – Via Boschetto,4.265780608164844
+F11,Farmacia Fantoni – Via Comacchio,F24,Farmacia Scandurra – Via Porta Mare,2.411959296644957
+F11,Farmacia Fantoni – Via Comacchio,F25,Farmacia Tondini – Via Ferrarese,2.925410849611959
+F11,Farmacia Fantoni – Via Comacchio,F26,Farmacia Ventura – Via Pontegradella,3.7599848538714578
+F11,Farmacia Fantoni – Via Comacchio,F27,Farmacia Vigna – Viale Risorgimento,2.476720868653166
+F11,Farmacia Fantoni – Via Comacchio,F28,Farmacia Zanella – Via Boccaleone,3.710719981708748
+F12,Farmacia Forti – Corso Porta Reno,F13,Farmacia Frizzi – Via Frizzi,1.4756934065026206
+F12,Farmacia Forti – Corso Porta Reno,F14,Farmacia Mastellari – Via Ripagrande,0.707961096180774
+F12,Farmacia Forti – Corso Porta Reno,F15,Farmacia Mazzini – Piazza Mazzini,0.9929198796699924
+F12,Farmacia Forti – Corso Porta Reno,F16,Farmacia Modonesi – Via Palestro,0.9919461215210552
+F12,Farmacia Forti – Corso Porta Reno,F17,Farmacia Paolini – Via Porta San Pietro,1.1149158121529803
+F12,Farmacia Forti – Corso Porta Reno,F18,Farmacia Raveri – Via Ravenna,1.6281191970479871
+F12,Farmacia Forti – Corso Porta Reno,F19,Farmacia Riminaldi – Viale Cavour,0.4477255293081795
+F12,Farmacia Forti – Corso Porta Reno,F20,Farmacia Rinaldi – Via Kennedy,2.393869623365612
+F12,Farmacia Forti – Corso Porta Reno,F21,Farmacia Rossi – Via Piangipane,2.2491271729516504
+F12,Farmacia Forti – Corso Porta Reno,F22,Farmacia Samaritana – Piazza Ariostea,0.5520706418158997
+F12,Farmacia Forti – Corso Porta Reno,F23,Farmacia Sant'Anna – Via Boschetto,2.5339208436509506
+F12,Farmacia Forti – Corso Porta Reno,F24,Farmacia Scandurra – Via Porta Mare,0.3917292510572523
+F12,Farmacia Forti – Corso Porta Reno,F25,Farmacia Tondini – Via Ferrarese,2.1921702621744217
+F12,Farmacia Forti – Corso Porta Reno,F26,Farmacia Ventura – Via Pontegradella,1.7981408941715529
+F12,Farmacia Forti – Corso Porta Reno,F27,Farmacia Vigna – Viale Risorgimento,0.8573082509306356
+F12,Farmacia Forti – Corso Porta Reno,F28,Farmacia Zanella – Via Boccaleone,2.1635818911318454
+F13,Farmacia Frizzi – Via Frizzi,F14,Farmacia Mastellari – Via Ripagrande,2.139471223691332
+F13,Farmacia Frizzi – Via Frizzi,F15,Farmacia Mazzini – Piazza Mazzini,0.5553795335930153
+F13,Farmacia Frizzi – Via Frizzi,F16,Farmacia Modonesi – Via Palestro,2.447091327190816
+F13,Farmacia Frizzi – Via Frizzi,F17,Farmacia Paolini – Via Porta San Pietro,1.4544651604644994
+F13,Farmacia Frizzi – Via Frizzi,F18,Farmacia Raveri – Via Ravenna,2.960437880252727
+F13,Farmacia Frizzi – Via Frizzi,F19,Farmacia Riminaldi – Viale Cavour,1.078032268930181
+F13,Farmacia Frizzi – Via Frizzi,F20,Farmacia Rinaldi – Via Kennedy,1.136382567788211
+F13,Farmacia Frizzi – Via Frizzi,F21,Farmacia Rossi – Via Piangipane,2.063141238114497
+F13,Farmacia Frizzi – Via Frizzi,F22,Farmacia Samaritana – Piazza Ariostea,1.8708749343835804
+F13,Farmacia Frizzi – Via Frizzi,F23,Farmacia Sant'Anna – Via Boschetto,1.0621920759935572
+F13,Farmacia Frizzi – Via Frizzi,F24,Farmacia Scandurra – Via Porta Mare,1.18417467987616
+F13,Farmacia Frizzi – Via Frizzi,F25,Farmacia Tondini – Via Ferrarese,1.629585565096685
+F13,Farmacia Frizzi – Via Frizzi,F26,Farmacia Ventura – Via Pontegradella,1.7745625031746834
+F13,Farmacia Frizzi – Via Frizzi,F27,Farmacia Vigna – Viale Risorgimento,0.7718720691857816
+F13,Farmacia Frizzi – Via Frizzi,F28,Farmacia Zanella – Via Boccaleone,2.8108327711863024
+F14,Farmacia Mastellari – Via Ripagrande,F15,Farmacia Mazzini – Piazza Mazzini,1.6923217851895611
+F14,Farmacia Mastellari – Via Ripagrande,F16,Farmacia Modonesi – Via Palestro,0.6370421638468191
+F14,Farmacia Mastellari – Via Ripagrande,F17,Farmacia Paolini – Via Porta San Pietro,1.3068610543990558
+F14,Farmacia Mastellari – Via Ripagrande,F18,Farmacia Raveri – Via Ravenna,1.4102690298447342
+F14,Farmacia Mastellari – Via Ripagrande,F19,Farmacia Riminaldi – Viale Cavour,1.06209765347568
+F14,Farmacia Mastellari – Via Ripagrande,F20,Farmacia Rinaldi – Via Kennedy,3.1003847151760557
+F14,Farmacia Mastellari – Via Ripagrande,F21,Farmacia Rossi – Via Piangipane,2.381164244387094
+F14,Farmacia Mastellari – Via Ripagrande,F22,Farmacia Samaritana – Piazza Ariostea,0.3277027160258139
+F14,Farmacia Mastellari – Via Ripagrande,F23,Farmacia Sant'Anna – Via Boschetto,3.201435403516048
+F14,Farmacia Mastellari – Via Ripagrande,F24,Farmacia Scandurra – Via Porta Mare,1.0942991225592265
+F14,Farmacia Mastellari – Via Ripagrande,F25,Farmacia Tondini – Via Ferrarese,2.4958901460872407
+F14,Farmacia Mastellari – Via Ripagrande,F26,Farmacia Ventura – Via Pontegradella,2.38380265811813
+F14,Farmacia Mastellari – Via Ripagrande,F27,Farmacia Vigna – Viale Risorgimento,1.429086172266914
+F14,Farmacia Mastellari – Via Ripagrande,F28,Farmacia Zanella – Via Boccaleone,2.447559309297534
+F15,Farmacia Mazzini – Piazza Mazzini,F16,Farmacia Modonesi – Via Palestro,1.925419119133744
+F15,Farmacia Mazzini – Piazza Mazzini,F17,Farmacia Paolini – Via Porta San Pietro,1.3532493861828845
+F15,Farmacia Mazzini – Piazza Mazzini,F18,Farmacia Raveri – Via Ravenna,2.408052746637496
+F15,Farmacia Mazzini – Piazza Mazzini,F19,Farmacia Riminaldi – Viale Cavour,0.6838485860827782
+F15,Farmacia Mazzini – Piazza Mazzini,F20,Farmacia Rinaldi – Via Kennedy,1.41538037799732
+F15,Farmacia Mazzini – Piazza Mazzini,F21,Farmacia Rossi – Via Piangipane,2.233950904748636
+F15,Farmacia Mazzini – Piazza Mazzini,F22,Farmacia Samaritana – Piazza Ariostea,1.4665484293285131
+F15,Farmacia Mazzini – Piazza Mazzini,F23,Farmacia Sant'Anna – Via Boschetto,1.5671225148205972
+F15,Farmacia Mazzini – Piazza Mazzini,F24,Farmacia Scandurra – Via Porta Mare,0.6527322127592439
+F15,Farmacia Mazzini – Piazza Mazzini,F25,Farmacia Tondini – Via Ferrarese,1.9193010201637688
+F15,Farmacia Mazzini – Piazza Mazzini,F26,Farmacia Ventura – Via Pontegradella,1.4172141856496998
+F15,Farmacia Mazzini – Piazza Mazzini,F27,Farmacia Vigna – Viale Risorgimento,0.5968816983216282
+F15,Farmacia Mazzini – Piazza Mazzini,F28,Farmacia Zanella – Via Boccaleone,2.322679077171217
+F16,Farmacia Modonesi – Via Palestro,F17,Farmacia Paolini – Via Porta San Pietro,1.898101633218532
+F16,Farmacia Modonesi – Via Palestro,F18,Farmacia Raveri – Via Ravenna,0.7732403618161399
+F16,Farmacia Modonesi – Via Palestro,F19,Farmacia Riminaldi – Viale Cavour,1.4367035552549712
+F16,Farmacia Modonesi – Via Palestro,F20,Farmacia Rinaldi – Via Kennedy,3.251995536696464
+F16,Farmacia Modonesi – Via Palestro,F21,Farmacia Rossi – Via Piangipane,3.0024280318746657
+F16,Farmacia Modonesi – Via Palestro,F22,Farmacia Samaritana – Piazza Ariostea,0.9224693166136452
+F16,Farmacia Modonesi – Via Palestro,F23,Farmacia Sant'Anna – Via Boschetto,3.4915363262182724
+F16,Farmacia Modonesi – Via Palestro,F24,Farmacia Scandurra – Via Porta Mare,1.2726925751134992
+F16,Farmacia Modonesi – Via Palestro,F25,Farmacia Tondini – Via Ferrarese,3.0724694655889224
+F16,Farmacia Modonesi – Via Palestro,F26,Farmacia Ventura – Via Pontegradella,2.201128851018729
+F16,Farmacia Modonesi – Via Palestro,F27,Farmacia Vigna – Viale Risorgimento,1.8440686546906215
+F16,Farmacia Modonesi – Via Palestro,F28,Farmacia Zanella – Via Boccaleone,1.971317706162196
+F17,Farmacia Paolini – Via Porta San Pietro,F18,Farmacia Raveri – Via Ravenna,2.6429624044181144
+F17,Farmacia Paolini – Via Porta San Pietro,F19,Farmacia Riminaldi – Viale Cavour,0.848740701029068
+F17,Farmacia Paolini – Via Porta San Pietro,F20,Farmacia Rinaldi – Via Kennedy,2.590043124760084
+F17,Farmacia Paolini – Via Porta San Pietro,F21,Farmacia Rossi – Via Piangipane,1.1378762765538044
+F17,Farmacia Paolini – Via Porta San Pietro,F22,Farmacia Samaritana – Piazza Ariostea,0.9850521571674392
+F17,Farmacia Paolini – Via Porta San Pietro,F23,Farmacia Sant'Anna – Via Boschetto,2.3813730367365573
+F17,Farmacia Paolini – Via Porta San Pietro,F24,Farmacia Scandurra – Via Porta Mare,1.263155071208372
+F17,Farmacia Paolini – Via Porta San Pietro,F25,Farmacia Tondini – Via Ferrarese,1.190012493890394
+F17,Farmacia Paolini – Via Porta San Pietro,F26,Farmacia Ventura – Via Pontegradella,2.669843138978275
+F17,Farmacia Paolini – Via Porta San Pietro,F27,Farmacia Vigna – Viale Risorgimento,0.760489807549721
+F17,Farmacia Paolini – Via Porta San Pietro,F28,Farmacia Zanella – Via Boccaleone,3.256637737202543
+F18,Farmacia Raveri – Via Ravenna,F19,Farmacia Riminaldi – Viale Cavour,2.0682001470962503
+F18,Farmacia Raveri – Via Ravenna,F20,Farmacia Rinaldi – Via Kennedy,3.57675372032336
+F18,Farmacia Raveri – Via Ravenna,F21,Farmacia Rossi – Via Piangipane,3.7625196339562974
+F18,Farmacia Raveri – Via Ravenna,F22,Farmacia Samaritana – Piazza Ariostea,1.6856144456583282
+F18,Farmacia Raveri – Via Ravenna,F23,Farmacia Sant'Anna – Via Boschetto,3.9493846293035832
+F18,Farmacia Raveri – Via Ravenna,F24,Farmacia Scandurra – Via Porta Mare,1.7910479038091227
+F18,Farmacia Raveri – Via Ravenna,F25,Farmacia Tondini – Via Ferrarese,3.796237317614475
+F18,Farmacia Raveri – Via Ravenna,F26,Farmacia Ventura – Via Pontegradella,2.2111753724990577
+F18,Farmacia Raveri – Via Ravenna,F27,Farmacia Vigna – Viale Risorgimento,2.474497949159185
+F18,Farmacia Raveri – Via Ravenna,F28,Farmacia Zanella – Via Boccaleone,1.550012651686366
+F19,Farmacia Riminaldi – Viale Cavour,F20,Farmacia Rinaldi – Via Kennedy,2.092321232093628
+F19,Farmacia Riminaldi – Viale Cavour,F21,Farmacia Rossi – Via Piangipane,1.9294262889190656
+F19,Farmacia Riminaldi – Viale Cavour,F22,Farmacia Samaritana – Piazza Ariostea,0.7989155150469887
+F19,Farmacia Riminaldi – Viale Cavour,F23,Farmacia Sant'Anna – Via Boschetto,2.1395564515432484
+F19,Farmacia Riminaldi – Viale Cavour,F24,Farmacia Scandurra – Via Porta Mare,0.4199235762187588
+F19,Farmacia Riminaldi – Viale Cavour,F25,Farmacia Tondini – Via Ferrarese,1.796284310394522
+F19,Farmacia Riminaldi – Viale Cavour,F26,Farmacia Ventura – Via Pontegradella,1.8364104970846096
+F19,Farmacia Riminaldi – Viale Cavour,F27,Farmacia Vigna – Viale Risorgimento,0.4096441988593335
+F19,Farmacia Riminaldi – Viale Cavour,F28,Farmacia Zanella – Via Boccaleone,2.4332374368084544
+F20,Farmacia Rinaldi – Via Kennedy,F21,Farmacia Rossi – Via Piangipane,3.1040823207749417
+F20,Farmacia Rinaldi – Via Kennedy,F22,Farmacia Samaritana – Piazza Ariostea,2.881867125156388
+F20,Farmacia Rinaldi – Via Kennedy,F23,Farmacia Sant'Anna – Via Boschetto,0.7749889242443883
+F20,Farmacia Rinaldi – Via Kennedy,F24,Farmacia Scandurra – Via Porta Mare,2.020253799638167
+F20,Farmacia Rinaldi – Via Kennedy,F25,Farmacia Tondini – Via Ferrarese,2.5876954307821536
+F20,Farmacia Rinaldi – Via Kennedy,F26,Farmacia Ventura – Via Pontegradella,1.6725621984360004
+F20,Farmacia Rinaldi – Via Kennedy,F27,Farmacia Vigna – Viale Risorgimento,1.8772289359356424
+F20,Farmacia Rinaldi – Via Kennedy,F28,Farmacia Zanella – Via Boccaleone,2.900397246577326
+F21,Farmacia Rossi – Via Piangipane,F22,Farmacia Samaritana – Piazza Ariostea,2.0800578849822657
+F21,Farmacia Rossi – Via Piangipane,F23,Farmacia Sant'Anna – Via Boschetto,2.61752543997096
+F21,Farmacia Rossi – Via Piangipane,F24,Farmacia Scandurra – Via Porta Mare,2.348215862863124
+F21,Farmacia Rossi – Via Piangipane,F25,Farmacia Tondini – Via Ferrarese,0.5943087680972438
+F21,Farmacia Rossi – Via Piangipane,F26,Farmacia Ventura – Via Pontegradella,3.644564849083388
+F21,Farmacia Rossi – Via Piangipane,F27,Farmacia Vigna – Viale Risorgimento,1.6802903824526445
+F21,Farmacia Rossi – Via Piangipane,F28,Farmacia Zanella – Via Boccaleone,4.362650566530294
+F22,Farmacia Samaritana – Piazza Ariostea,F23,Farmacia Sant'Anna – Via Boschetto,2.928254415399841
+F22,Farmacia Samaritana – Piazza Ariostea,F24,Farmacia Scandurra – Via Porta Mare,0.9361636982870856
+F22,Farmacia Samaritana – Piazza Ariostea,F25,Farmacia Tondini – Via Ferrarese,2.1717612895920477
+F22,Farmacia Samaritana – Piazza Ariostea,F26,Farmacia Ventura – Via Pontegradella,2.3386393873348226
+F22,Farmacia Samaritana – Piazza Ariostea,F27,Farmacia Vigna – Viale Risorgimento,1.1331455476659034
+F22,Farmacia Samaritana – Piazza Ariostea,F28,Farmacia Zanella – Via Boccaleone,2.5657268454922595
+F23,Farmacia Sant'Anna – Via Boschetto,F24,Farmacia Scandurra – Via Porta Mare,2.219240583942015
+F23,Farmacia Sant'Anna – Via Boschetto,F25,Farmacia Tondini – Via Ferrarese,2.048171953032327
+F23,Farmacia Sant'Anna – Via Boschetto,F26,Farmacia Ventura – Via Pontegradella,2.3202875058096617
+F23,Farmacia Sant'Anna – Via Boschetto,F27,Farmacia Vigna – Viale Risorgimento,1.806844495459508
+F23,Farmacia Sant'Anna – Via Boschetto,F28,Farmacia Zanella – Via Boccaleone,3.5179984263767983
+F24,Farmacia Scandurra – Via Porta Mare,F25,Farmacia Tondini – Via Ferrarese,2.1900411781862523
+F24,Farmacia Scandurra – Via Porta Mare,F26,Farmacia Ventura – Via Pontegradella,1.4647692417971887
+F24,Farmacia Scandurra – Via Porta Mare,F27,Farmacia Vigna – Viale Risorgimento,0.7450276299681581
+F24,Farmacia Scandurra – Via Porta Mare,F28,Farmacia Zanella – Via Boccaleone,2.015190918946963
+F25,Farmacia Tondini – Via Ferrarese,F26,Farmacia Ventura – Via Pontegradella,3.330579897059177
+F25,Farmacia Tondini – Via Ferrarese,F27,Farmacia Vigna – Viale Risorgimento,1.454429255224085
+F25,Farmacia Tondini – Via Ferrarese,F28,Farmacia Zanella – Via Boccaleone,4.180784974751014
+F26,Farmacia Ventura – Via Pontegradella,F27,Farmacia Vigna – Viale Risorgimento,1.97131507895607
+F26,Farmacia Ventura – Via Pontegradella,F28,Farmacia Zanella – Via Boccaleone,1.229297996665057
+F27,Farmacia Vigna – Viale Risorgimento,F28,Farmacia Zanella – Via Boccaleone,2.7279064556461736
