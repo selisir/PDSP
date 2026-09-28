@@ -83,3 +83,25 @@ $$\sum_{h'=h}^{h+s-1} x_{fh'} \le k \qquad \forall f \in F,\ \forall h = 1,\dots
 - Le variabili $y_{fgh}$ vanno create **solo per le coppie con $c_{fg}>0$**, usando `create(...)` su array dinamici.
 - Considerare solo le coppie con $f<g$: le coppie ordinate si contano una volta sola.
 - $f$ e $g$ sono entrambe indicizzate su $H$.
+
+
+--- COPERTURA PER QUARTIERE ---
+
+Q1 -> F1, F2, F3, F10, F25, F26, F27
+
+Q2 -> F5, F6, F7, F13, F14, F15, F21, F23
+
+Q3 -> F8, F9, F10, F11
+
+Q4 -> F5, F12, F13, F14, F21
+
+Q5 -> F1, F2, F12, F17, F18, F19, F28
+
+Q6 -> F2, F5, F6, F7, F23, F25
+
+Q7 -> F1, F3, F17, F24, F26, F27
+
+Q8 -> F1, F12, F13, F14, F15, F28
+
+
+
