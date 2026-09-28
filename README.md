@@ -1,6 +1,8 @@
 # PDSP – Pharmacy Duty Scheduling Problem
 📎 [Presentazione](https://canva.link/dy5vi8qopmeiahs)
+@Mottyna 
 ---
+
 ## 1. Descrizione del problema
 
 Progetto per il corso di **Metodi di Ottimizzazione** (gruppo da 2 persone; varianti per gruppi da 3).
