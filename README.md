@@ -1,6 +1,9 @@
 # PDSP – Pharmacy Duty Scheduling Problem
+
 📎 [Presentazione](https://canva.link/dy5vi8qopmeiahs)
+
 Progetto fatto with [@Mottyna](https://github.com/Mottyna)
+
 ---
 
 ## 1. Descrizione del problema
@@ -18,6 +21,7 @@ aperte di notte nello stesso giorno) è la somma per ogni coppia di farmacie f,g
 quando sono vicine. Si cerca l’insieme di turni di costo minimo. Per 2 persone. Variante 1
 per 3 persone: risolvere con la generazione di colonne. Variante 2 per 3 persone: ogni
 farmacia non può fare più di k turni ogni s giorni.
+
 ---
 
 ## 2. Modello matematico
