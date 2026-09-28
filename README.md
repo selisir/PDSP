@@ -84,24 +84,15 @@ $$\sum_{h'=h}^{h+s-1} x_{fh'} \le k \qquad \forall f \in F,\ \forall h = 1,\dots
 - Considerare solo le coppie con $f<g$: le coppie ordinate si contano una volta sola.
 - $f$ e $g$ sono entrambe indicizzate su $H$.
 
+---
 
---- COPERTURA PER QUARTIERE ---
+## 4. COMUNICAZIONE
 
-Q1 -> F1, F2, F3, F10, F25, F26, F27
-
-Q2 -> F5, F6, F7, F13, F14, F15, F21, F23
-
-Q3 -> F8, F9, F10, F11
-
-Q4 -> F5, F12, F13, F14, F21
-
-Q5 -> F1, F2, F12, F17, F18, F19, F28
-
-Q6 -> F2, F5, F6, F7, F23, F25
-
-Q7 -> F1, F3, F17, F24, F26, F27
-
-Q8 -> F1, F12, F13, F14, F15, F28
-
+writeln("\n--- DIAGNOSTICA FARMACIE SENZA COPERTURA ---")
+writeln("sigma = ", sigma)
+forall(f in F | sum(q in Q) copertura(q,f) = 0) do
+    dmin := min(q in Q) t_dist(q,f)
+    writeln("F", f, " -> distanza minima da un quartiere: ", dmin)
+end-do
 
 
