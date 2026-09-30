@@ -1,0 +1,171 @@
+model "PDSP_Modello_Lazy"
+uses "mmxprs"
+
+! =========================================================================
+! BLOCCO 1: dimensioni e parametri (uguale a non lazy)
+! =========================================================================
+declarations
+    n_quartieri: integer
+    n_farmacie: integer
+    n_giorni: integer ! Giorni totali
+
+    sigma: real       ! Raggio massimo di copertura quartiere-farmacia
+    delta: real       ! Raggio massimo di vicinanza farmacia-farmacia (penalita')
+    k_turni: integer  ! Numero massimo di turni consentiti
+    
+    s_giorni: integer ! Finestra sliding window
+    s_turni: integer  ! Numero turni massimi per sliding window
+                       
+end-declarations
+
+initializations from "datafile.dat"
+    n_quartieri n_farmacie n_giorni
+    sigma delta k_turni s_giorni s_turni
+end-initializations
+
+! =========================================================================
+! BLOCCO 2: insiemi e strutture dati
+! =========================================================================
+declarations
+    Q = 1..n_quartieri
+    F = 1..n_farmacie
+    H = 1..n_giorni
+
+    t_dist: array(F, Q) of real   				! distanza t_{fq} tra quartiere e farmacia
+    pi_dist: array(F, F) of real  				! distanza pi_{fg} tra farmacia e farmacia 
+
+    copertura: array(Q, F) of integer  			! 1 se t(f,q) <= sigma, 0 altrimenti
+    costo: array(F, F) of real         			! delta - pi(f,g) se pi(f,g) e' < delta, 0 altrimenti     
+
+    x: array(F, H) of mpvar            			! x(f,h)=1 se farmacia f e' di turno il giorno h
+    y: dynamic array(F, F, H) of mpvar 			! variablili di linearizazzione
+    
+    F_Obiettivo: linctr                			! funzione obiettivo
+    cut_link: dynamic array(F, F, H) of linctr 	! vincoli generati
+end-declarations
+
+initializations from "datafile.dat"
+    t_dist pi_dist
+end-initializations
+
+! Controllo s_giorni
+if s_giorni > n_giorni then
+    writeln("ERRORE: s_giorni non puo' essere maggiore di n_giorni")
+    exit(1)
+end-if
+
+! --- PRECALCOLO PARAMETRI ---
+
+! Matrice di copertura
+forall(f in F, q in Q) do
+    if t_dist(f,q) <= sigma then
+        copertura(q,f) := 1
+    else
+        copertura(q,f) := 0
+    end-if
+end-do
+
+! Matrice dei costi (solo f < g)
+forall(f, g in F | f < g) do
+    if pi_dist(f,g) < delta then
+        costo(f,g) := delta - pi_dist(f,g)
+    else
+        costo(f,g) := 0.0
+    end-if
+end-do
+
+! Dominio variabili x
+forall(f in F, h in H) x(f,h) is_binary
+
+! --- VINCOLI ---
+
+! Copertura
+forall(q in Q, h in H) do
+    sum(f in F | copertura(q,f) = 1) x(f,h) >= 1
+end-do
+
+! Turnistica - sliding window
+if s_giorni < n_giorni then
+    forall(f in F, inizio in 1..(n_giorni - s_giorni + 1)) do
+       sum(h in inizio..(inizio + s_giorni - 1)) x(f,h) <= s_turni
+    end-do
+end-if
+
+! Turnistica - non sliding window
+forall(f in F) do
+    sum(h in H) x(f,h) <= k_turni
+end-do
+
+! --- FUNZIONE OBIETTIVO ---
+
+F_Obiettivo := 0
+
+! --- GENERAZIONE DINAMICA DEI VINCOLI ---
+
+declarations
+    n_iter: integer
+    vincoli_aggiunti_totali: integer
+    vincoli_aggiunti_iter: integer
+    trovata_violazione: boolean
+end-declarations
+
+n_iter := 0
+vincoli_aggiunti_totali := 0
+
+writeln("--- INIZIO LOOP PROBLEMA RILASSATO ---")
+
+repeat
+    n_iter += 1
+    minimize(F_Obiettivo)
+    
+    trovata_violazione := false
+    vincoli_aggiunti_iter := 0
+    
+    ! Scansione violazioni: due farmacie aperte nello stesso giorno con costo > 0
+    forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
+        if getsol(x(f,h)) + getsol(x(g,h)) > 1.5 and not exists(y(f,g,h)) then
+        	create(y(f,g,h))
+        	cut_link(f,g,h) := y(f,g,h) >= x(f,h) + x(g,h) - 1
+        	
+        	F_Obiettivo += costo(f,g) * y(f,g,h)
+            
+            trovata_violazione := true
+            vincoli_aggiunti_iter += 1
+        end-if
+    end-do
+    
+    vincoli_aggiunti_totali += vincoli_aggiunti_iter
+    writeln("Iterazione ", n_iter, " | Costo: ", getobjval, " | Nuovi vincoli aggiunti: ", vincoli_aggiunti_iter)
+
+until not trovata_violazione
+
+! --- STAMPA RISULTATI FINALI ---
+
+writeln("\n--- OTTIMO GLOBALE RAGGIUNTO ---")
+writeln("Iterazioni totali: ", n_iter)
+writeln("Variabili y generati: ", vincoli_aggiunti_totali)
+writeln("Costo totale (funzione obiettivo): ", getobjval)
+
+writeln("\n")
+
+! Stampa turni
+forall(h in H) do
+    write("Giorno ", h, "\t-> Farmacie aperte: ")
+    forall(f in F | getsol(x(f,h)) > 0.5) do
+        write("F", f, " ")
+    end-do
+    writeln("")
+end-do
+
+writeln("\n")
+
+! Stampa per turni farmacie
+forall(f in F) do
+	write("Farmacia F", f, "\t-> Turni: ")
+	forall(h in H) do
+	 	write(getsol(x(f,h)), ", ")
+	end-do
+	writeln("")
+end-do
+
+end-model
