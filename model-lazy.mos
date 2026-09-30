@@ -1,5 +1,5 @@
 model "PDSP_Modello_Lazy"
-uses "mmxprs"
+uses "mmxprs", "mmive"
 
 ! =========================================================================
 ! BLOCCO 1: dimensioni e parametri (uguale a non lazy)
@@ -18,7 +18,7 @@ declarations
                        
 end-declarations
 
-initializations from "datafile.dat"
+initializations from "datafile-argento.dat"
     n_quartieri n_farmacie n_giorni
     sigma delta k_turni s_giorni s_turni
 end-initializations
@@ -42,9 +42,10 @@ declarations
     
     F_Obiettivo: linctr                			! funzione obiettivo
     cut_link: dynamic array(F, F, H) of linctr 	! vincoli generati
+
 end-declarations
 
-initializations from "datafile.dat"
+initializations from "datafile-argento.dat"
     t_dist pi_dist
 end-initializations
 
@@ -95,6 +96,33 @@ end-if
 forall(f in F) do
     sum(h in H) x(f,h) <= k_turni
 end-do
+
+! --- STAMPA COPERTURA QUARTIERI ---
+
+writeln("\n--- COPERTURA PER QUARTIERE ---")
+forall(q in Q) do
+    write("Q", q, " -> ")
+    n_aperte := 0
+    forall(f in F | copertura(q,f) = 1) do
+        if n_aperte > 0 then
+            write(", ")
+        end-if
+        write("F", f)
+        n_aperte += 1
+    end-do
+    writeln("")
+end-do
+
+writeln("\n--- FARMACIE SENZA COPERTURA (per scelta di sigma) ---")
+writeln("sigma = ", sigma) 
+forall(f in F | sum(q in Q) copertura(q,f) = 0) do 
+	dmin := min(q in Q) t_dist(f,q)
+	writeln("F", f, " -> distanza minima da un quartiere: ", dmin) 
+end-do
+
+writeln("\n")
+
+IVEpause("Click on pause button to continue")
 
 ! --- FUNZIONE OBIETTIVO ---
 

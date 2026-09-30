@@ -18,9 +18,11 @@ di un periodo H (es H=1..28) quali farmacie fanno il servizio notturno in modo c
 giorno ogni quartiere sia coperti da almeno una farmacia aperta, e che una stessa farmacia
 non sia di turno durante H per più di k volte. La qualità di un “turno” (insieme di farmacie
 aperte di notte nello stesso giorno) è la somma per ogni coppia di farmacie f,g di ($$\delta - \pi_{fg}$$)
-quando sono vicine. Si cerca l’insieme di turni di costo minimo. Per 2 persone. Variante 1
-per 3 persone: risolvere con la generazione di colonne. Variante 2 per 3 persone: ogni
-farmacia non può fare più di k turni ogni s giorni.
+quando sono vicine. Si cerca l’insieme di turni di costo minimo. 
+
+**Variante 1**: risolvere con la generazione di colonne.
+
+**Variante 2**: ogni farmacia non può fare più di k turni ogni s giorni.
 
 ---
 
@@ -88,11 +90,8 @@ $$\sum_{h'=h}^{h+s-1} x_{fh'} \le k \qquad \forall f \in F,\ \forall h = 1,\dots
 
 ## 4. COMUNICAZIONE
 
-writeln("\n--- DIAGNOSTICA FARMACIE SENZA COPERTURA ---")
-writeln("sigma = ", sigma)
-forall(f in F | sum(q in Q) copertura(q,f) = 0) do
-    dmin := min(q in Q) t_dist(q,f)
-    writeln("F", f, " -> distanza minima da un quartiere: ", dmin)
-end-do
+il modello lazy non genera tutti i vincoli di linearizzazione in una volta all'inizio del programma, li 
+genera solo quando si accorge che sono stati violati dalla versione rilassata del problema.
+Continua in un loop di minimizzazione, check se violi dei vincoli finche' nessun vincolo e' violato
 
 
