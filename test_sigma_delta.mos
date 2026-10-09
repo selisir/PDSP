@@ -1,0 +1,167 @@
+ (!
+  test_sigma_delta.mos
+  --------------------
+  Test parametrico PDSP: risolve per ogni combinazione (sigma, delta).
+!)
+
+model "test"
+  uses "mmxprs", "mmsystem"
+
+! =========================================================================
+! BLOCCO 1: dimensioni e parametri scalari
+! =========================================================================
+declarations
+    n_quartieri : integer
+    n_farmacie  : integer
+    n_giorni    : integer
+    k_turni     : integer
+    s_giorni    : integer
+    s_turni     : integer
+end-declarations
+
+initializations from "datafile.dat"
+    n_quartieri n_farmacie n_giorni
+    k_turni s_giorni s_turni
+end-initializations
+
+! =========================================================================
+! BLOCCO 2: insiemi, distanze, variabili decisionali
+! =========================================================================
+declarations
+    Q = 1..n_quartieri
+    F = 1..n_farmacie
+    H = 1..n_giorni
+
+    t_dist  : array(F, Q) of real
+    pi_dist : array(F, F) of real
+
+    copertura : array(Q, F) of integer
+    costo     : array(F, F) of real
+
+    x : array(F, H) of mpvar
+    y : dynamic array(F, F, H) of mpvar
+end-declarations
+
+initializations from "datafile.dat"
+    t_dist pi_dist
+end-initializations
+
+! =========================================================================
+! BLOCCO 3: griglia di test — TUTTE le dichiarazioni qui
+! =========================================================================
+declarations
+    N_SIGMA = 1   ! metti 5 per il test completo
+    N_DELTA = 1
+
+    SIGMA_VALS : array(1..N_SIGMA) of real
+    DELTA_VALS : array(1..N_DELTA) of real
+
+    si : integer
+    di : integer
+    f  : integer
+    g  : integer
+    q  : integer
+    h  : integer
+
+    sigma       : real
+    delta       : real
+    costo_ottimo : real
+    n_coppie    : integer
+    n_coperti   : integer
+
+    fo : integer
+end-declarations
+
+! Valori griglia
+SIGMA_VALS(1) := 2.0
+DELTA_VALS(1) := 1.0
+! SIGMA_VALS(2) := 1.0 ...
+
+! =========================================================================
+! BLOCCO 4: x binarie (fissate una volta, non cambiano tra i run)
+! =========================================================================
+forall(f in F, h in H) x(f,h) is_binary
+
+! =========================================================================
+! BLOCCO 5: apri CSV output
+! =========================================================================
+fo := fopen("risultati_test.csv", F_OUTPUT)
+fwriteln(fo, "sigma,delta,costo_ottimo,n_coppie_vicine,n_quartieri_coperti")
+
+! =========================================================================
+! DOPPIO LOOP
+! =========================================================================
+forall(si in 1..N_SIGMA) do
+    forall(di in 1..N_DELTA) do
+
+        sigma := SIGMA_VALS(si)
+        delta := DELTA_VALS(di)
+
+        ! --- ricalcola copertura ---
+        forall(q in Q, f in F)
+            copertura(q,f) := if(t_dist(f,q) <= sigma, 1, 0)
+
+        ! --- ricalcola costi coppia ---
+        n_coppie := 0
+        forall(f in F, g in F | f < g) do
+            if pi_dist(f,g) < delta then
+                costo(f,g) := delta - pi_dist(f,g)
+                n_coppie   := n_coppie + 1
+            else
+                costo(f,g) := 0
+            end-if
+        end-do
+
+        ! --- ricrea variabili y per le coppie attive ---
+        forall(f in F, g in F, h in H | f < g and costo(f,g) > 0) do
+            create(y(f,g,h))
+            y(f,g,h) is_binary
+        end-do
+
+        ! --- vincoli copertura ---
+        forall(q in Q, h in H)
+            sum(f in F | copertura(q,f) = 1) x(f,h) >= 1
+
+        ! --- vincolo max turni ---
+        forall(f in F)
+            sum(h in H) x(f,h) <= k_turni
+
+        ! --- linearizzazione ---
+        forall(f in F, g in F, h in H | f < g and costo(f,g) > 0)
+            y(f,g,h) >= x(f,h) + x(g,h) - 1
+
+        ! --- risolvi ---
+        minimize(sum(f in F, g in F, h in H | f < g and costo(f,g) > 0)
+                    costo(f,g) * y(f,g,h))
+
+        costo_ottimo := getobjval
+
+        ! --- conta quartieri coperti (giorno 1 come campione) ---
+        n_coperti := 0
+        forall(q in Q) do
+            if getsol(sum(f in F | copertura(q,f) = 1) x(f,1)) >= 0.5 then
+                n_coperti := n_coperti + 1
+            end-if
+        end-do
+
+        ! --- scrivi CSV ---
+        fwriteln(fo,
+            string(sigma)        + "," +
+            string(delta)        + "," +
+            string(costo_ottimo) + "," +
+            string(n_coppie)     + "," +
+            string(n_coperti)
+        )
+
+        writeln("sigma=", sigma, "  delta=", delta,
+                "  costo=", costo_ottimo,
+                "  coppie=", n_coppie,
+                "  coperti=", n_coperti)
+
+    end-do
+end-do
+
+fclose(fo)
+writeln("Fine. Risultati in: risultati_test.csv")
+
+end-model
