@@ -1,0 +1,181 @@
+(!
+  test_sigma_delta.mos
+  --------------------
+  Test parametrico: risolve il PDSP per ogni combinazione
+  (sigma, delta) e salva costo ottimo + statistiche su CSV.
+
+  Sigma: raggio copertura quartiere-farmacia  (t_qf <= sigma)
+  Delta: soglia distanza tra farmacie         (pi_fg < delta ? coppia vicina)
+!)
+
+model "test"
+  uses "mmxprs", "mmsystem"
+
+! =========================================================================
+! BLOCCO 1: dimensioni e parametri
+! =========================================================================
+declarations
+    n_quartieri: integer
+    n_farmacie: integer
+    n_giorni: integer
+
+    k_turni: integer
+    s_giorni: integer
+    s_turni: integer
+end-declarations
+
+initializations from "datafile.dat"
+    n_quartieri n_farmacie n_giorni
+    k_turni s_giorni s_turni
+end-initializations
+
+! =========================================================================
+! BLOCCO 2: insiemi e strutture dati
+! =========================================================================
+declarations
+    Q = 1..n_quartieri
+    F = 1..n_farmacie
+    H = 1..n_giorni
+
+    t_dist: array(F, Q) of real   ! distanza t_{fq} tra farmacia e quartiere
+    pi_dist: array(F, F) of real  ! distanza pi_{fg} tra farmacia e farmacia
+
+    copertura: array(Q, F) of integer  ! 1 se t(f,q) <= sigma, 0 altrimenti
+    costo: array(F, F) of real         ! delta - pi(f,g) se pi(f,g) < delta, 0 altrimenti
+
+    x: array(F, H) of mpvar            ! x(f,h)=1 se farmacia f e' di turno il giorno h
+    y: dynamic array(F, F, H) of mpvar ! variabile di linearizzazione
+    
+    obiettivo: linctr                  ! funzione obiettivo
+end-declarations
+
+initializations from "datafile.dat"
+    t_dist pi_dist
+end-initializations
+
+declarations
+    N_SIGMA = 1
+    N_DELTA = 1
+
+    SIGMA_VALS : array(1..N_SIGMA) of real
+    DELTA_VALS : array(1..N_DELTA) of real
+    
+    sigma: real
+    delta: real
+
+    costo_ottimo : real
+    n_coppie     : integer
+    n_coperti    : integer
+end-declarations
+
+! Valori della griglia
+SIGMA_VALS(1) := 2.0
+DELTA_VALS(1) := 1.0
+
+declarations
+    id_csv, id_soluzioni: integer
+end-declarations
+
+! Apri entrambi i file e cattura i loro ID
+fopen("risultati_test.csv", F_OUTPUT)
+id_csv := getfid(F_OUTPUT)
+
+fopen("soluzioni_test.txt", F_OUTPUT)
+id_soluzioni := getfid(F_OUTPUT)
+
+fselect(id_csv)
+writeln("sigma,delta,costo_ottimo,n_coppie_vicine,n_quartieri_coperti")
+
+! -----------------------------------------------------------------------
+! DOPPIO LOOP: sigma fisso, delta scorre; poi sigma avanza
+! -----------------------------------------------------------------------
+forall(si in 1..N_SIGMA) do
+    forall(di in 1..N_DELTA) do
+
+        ! 1. Aggiorna parametri globali usati dal modello
+        sigma := SIGMA_VALS(si)
+        delta := DELTA_VALS(di)
+
+        ! 2. Ricalcola copertura e costi con i nuovi sigma/delta
+        forall(q in Q, f in F)
+            copertura(q,f) := if(t_dist(f,q) <= sigma, 1, 0)
+
+        n_coppie := 0
+        forall(f in F, g in F | f < g) do
+            if pi_dist(f,g) < delta then
+                costo(f,g) := delta - pi_dist(f,g)
+                n_coppie += 1
+            else
+                costo(f,g) := 0
+            end-if
+        end-do
+
+        forall(f in F, h in H) x(f,h) is_binary
+
+        ! Creazione delle y per le coppie che generano costo > 0
+        forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
+            create(y(f,g,h))
+            y(f,g,h) is_binary
+        end-do
+        
+        ! Copertura
+		forall(q in Q, h in H) do
+		    sum(f in F | copertura(q,f) = 1) x(f,h) >= 1
+		end-do
+		
+		! Turnistica - non sliding window
+		forall(f in F) do
+		    sum(h in H) x(f,h) <= k_turni
+		end-do
+		
+		! Linearizzazione
+		forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
+		    y(f,g,h) >= x(f,h) + x(g,h) - 1
+		end-do
+
+        ! 4. Risolvi
+        obiettivo := sum(f, g in F, h in H | f < g and costo(f,g) > 0) (costo(f,g) * y(f,g,h))
+        minimize(obiettivo)
+        costo_ottimo := getobjval
+        
+        fselect(id_soluzioni)
+        
+        writeln("\n--- RISULTATI OTTIMIZZAZIONE sigma = ", sigma, ", delta = ", delta, " ---")
+		writeln("Status soluzione: ", getprobstat)
+		writeln("Costo totale (funzione obiettivo): ", getobjval)
+		writeln("")
+		
+		! Stampa per giornate
+		forall(h in H) do
+		    write("Giorno ", h, "\t-> Farmacie aperte: ")
+		    forall(f in F) do
+		        if getsol(x(f,h)) = 1 then
+		            write("F", f, " ")
+		        end-if
+		    end-do
+		    writeln("")
+		end-do
+		
+		writeln("")
+
+        ! 5. Conta quartieri effettivamente coperti al giorno 1
+        n_coperti := 0
+        forall(q in Q) do
+            if getsol(sum(f in F) copertura(q,f) * x(f,1)) >= 1 then
+                n_coperti += 1
+            end-if
+        end-do
+
+        ! 6. Scrivi riga nel CSV
+        fselect(id_csv)
+        writeln(sigma, ",", delta, ",", costo_ottimo, ",", n_coppie, ",", n_coperti)
+
+    end-do  ! fine loop delta
+end-do    ! fine loop sigma
+
+! Chiudi il file CSV e ripristina lo standard output sul terminale
+fclose(id_csv)
+fclose(id_soluzioni)
+writeln("Fine. Risultati salvati in: risultati_test.csv")
+
+end-model
