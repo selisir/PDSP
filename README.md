@@ -94,4 +94,126 @@ il modello lazy non genera tutti i vincoli di linearizzazione in una volta all'i
 genera solo quando si accorge che sono stati violati dalla versione rilassata del problema.
 Continua in un loop di minimizzazione, check se violi dei vincoli finche' nessun vincolo e' violato
 
+---
+
+## 5. Test da fare
+
+- doro ha poche farmacie - più costo per le farmacie
+- test base con datafile completo + datafile argento
+- test con sliding windows sia datafile completo e argento 
+- possiamo solo pensare alle colonne non c'è bisogno del test
+- test con output grafico con cambio variabili -- possiamo automatizzare
+
+---
+
+## codice test forall
+
+(!
+  test_sigma_delta.mos
+  --------------------
+  Test parametrico: risolve il PDSP per ogni combinazione
+  (sigma, delta) e salva costo ottimo + statistiche su CSV.
+
+  Sigma: raggio copertura quartiere-farmacia  (t_qf <= sigma)
+  Delta: soglia distanza tra farmacie         (pi_fg < delta → coppia vicina)
+!)
+
+model "test_sigma_delta"
+  uses "mmxprs", "mmsystem"
+
+  ! --- includi qui il tuo datafile con t_qf, pi_fg, N_Q, N_F, H, k ---
+  ! (adatta i nomi alle tue dichiarazioni esistenti)
+
+  declarations
+    ! Griglia di test per sigma e delta
+    N_SIGMA = 5
+    N_DELTA = 5
+
+    SIGMA_VALS : array(1..N_SIGMA) of real
+    DELTA_VALS : array(1..N_DELTA) of real
+
+    ! Indici di scorrimento (dichiarati qui, MAI dentro forall)
+    si : integer
+    di : integer
+
+    ! Variabili per risultati del singolo run
+    costo_ottimo : real
+    n_coppie     : integer
+    n_coperti    : integer
+
+    fo : integer
+  end-declarations
+
+  ! Valori della griglia (modifica secondo il tuo dominio)
+  SIGMA_VALS(1) := 0.8  ; SIGMA_VALS(2) := 1.0  ; SIGMA_VALS(3) := 1.2
+  SIGMA_VALS(4) := 1.5  ; SIGMA_VALS(5) := 2.0
+
+  DELTA_VALS(1) := 0.5  ; DELTA_VALS(2) := 0.8  ; DELTA_VALS(3) := 1.0
+  DELTA_VALS(4) := 1.2  ; DELTA_VALS(5) := 1.5
+
+  ! Apri CSV di output
+  fo := fopen("risultati_test.csv", F_OUTPUT)
+  fwriteln(fo, "sigma,delta,costo_ottimo,n_coppie_vicine,n_quartieri_coperti")
+
+  ! -----------------------------------------------------------------------
+  ! DOPPIO LOOP: sigma fisso, delta scorre; poi sigma avanza
+  ! -----------------------------------------------------------------------
+  forall(si in 1..N_SIGMA) do
+    forall(di in 1..N_DELTA) do
+
+      ! 1. Aggiorna parametri globali usati dal modello
+      sigma := SIGMA_VALS(si)
+      delta := DELTA_VALS(di)
+
+      ! 2. Ricalcola C(q) e costi c_fg con i nuovi sigma/delta
+      !    (chiama la tua procedura di precalcolo oppure inline)
+      forall(q in 1..N_Q, f in 1..N_F)
+        copertura(q,f) := if(t(q,f) <= sigma, 1, 0)
+
+      n_coppie := 0
+      forall(f in 1..N_F, g in f+1..N_F) do
+        if pi(f,g) < delta then
+          c(f,g)   := delta - pi(f,g)
+          n_coppie += 1
+        else
+          c(f,g) := 0
+        end-if
+      end-do
+
+      ! 3. Ricostruisci variabili y solo per coppie attive
+      !    (se usi create() su array dinamici, ricreali qui)
+
+      ! 4. Risolvi
+      minimize(obiettivo)
+      costo_ottimo := getobjval
+
+      ! 5. Conta quartieri effettivamente coperti
+      n_coperti := 0
+      forall(q in 1..N_Q) do
+        if getsol(sum(f in 1..N_F) copertura(q,f) * x(f,1)) >= 1 then
+          n_coperti += 1
+        end-if
+      end-do
+
+      ! 6. Scrivi riga CSV
+      fwriteln(fo,
+        string(sigma)       + "," +
+        string(delta)       + "," +
+        string(costo_ottimo) + "," +
+        string(n_coppie)    + "," +
+        string(n_coperti)
+      )
+
+      writeln("sigma=", sigma, "  delta=", delta,
+              "  costo=", costo_ottimo,
+              "  coppie=", n_coppie)
+
+    end-do  ! fine loop delta
+  end-do    ! fine loop sigma
+
+  fclose(fo)
+  writeln("Fine. Risultati in: risultati_test.csv")
+
+end-model
+
 
