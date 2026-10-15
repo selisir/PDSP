@@ -1,0 +1,243 @@
+(!
+  test_sigma_delta.mos
+  --------------------
+  Test parametrico: risolve il PDSP per ogni combinazione
+  (k_turni, s_giorni, s_turni, sigma, delta) e salva costo ottimo + statistiche su CSV.
+!)
+
+model "test"
+  uses "mmxprs", "mmsystem"
+
+! =========================================================================
+! BLOCCO 1: dimensioni e parametri
+! =========================================================================
+declarations
+    n_quartieri: integer
+    n_farmacie: integer
+    
+    n_giorni = 30
+end-declarations
+
+initializations from "datafile.dat"
+    n_quartieri n_farmacie
+end-initializations
+
+! =========================================================================
+! BLOCCO 2: insiemi e strutture dati
+! =========================================================================
+declarations
+    Q = 1..n_quartieri
+    F = 1..n_farmacie
+    H = 1..n_giorni
+
+    t_dist: array(F, Q) of real   ! distanza t_{fq} tra farmacia e quartiere
+    pi_dist: array(F, F) of real  ! distanza pi_{fg} tra farmacia e farmacia
+
+    copertura: array(Q, F) of integer  ! 1 se t(f,q) <= sigma, 0 altrimenti
+    costo: array(F, F) of real         ! delta - pi(f,g) se pi(f,g) < delta, 0 altrimenti
+
+    x: array(F, H) of mpvar            ! x(f,h)=1 se farmacia f e' di turno il giorno h
+    y: dynamic array(F, F, H) of mpvar ! variabile di linearizzazione
+    
+    obiettivo: linctr                  ! funzione obiettivo
+
+    ! DICHIARAZIONE ESPLICITA DEI VINCOLI (per resettarli ad ogni iterazione)
+    VincoloCopertura: array(Q, H) of linctr
+    VincoloTurniTotali: array(F) of linctr
+    VincoloSliding: dynamic array(F, integer) of linctr
+    VincoloLinearizz: dynamic array(F, F, H) of linctr
+end-declarations
+
+initializations from "datafile.dat"
+    t_dist pi_dist
+end-initializations
+
+declarations
+    N_SIGMA = 50
+    N_DELTA = 50
+    N_K_TURNI = 30 ! numero turni max totali
+    N_S_GIORNI = 30 ! grandezza finestra 
+    N_S_TURNI = 30 ! numero turni max per finestra
+
+    SIGMA_VALS : array(1..N_SIGMA) of real
+    DELTA_VALS : array(1..N_DELTA) of real
+    K_TURNI_VALS : array(1..N_K_TURNI) of integer
+    N_S_GIORNI_VALS : array(1..N_S_GIORNI) of integer     
+    
+    ! DICHIARAZIONE DELLE VARIABILI DI CICLO
+    sigma, delta: real
+    k_turni, s_giorni, s_turni: integer
+    is_infeasible: boolean
+
+    costo_ottimo : real
+    n_coppie     : integer
+    n_coperti    : integer
+end-declarations
+
+! Generazione dinamica dei valori
+forall(i in 1..N_SIGMA) do
+  SIGMA_VALS(i) := i * 0.1
+  DELTA_VALS(i) := i * 0.1
+end-do
+
+forall(i in 1..N_K_TURNI) do
+  K_TURNI_VALS(i) := 31 - i
+end-do
+
+! Popolamento dell'array N_S_GIORNI_VALS (prima mancava!)
+forall(i in 1..N_S_GIORNI) do
+  N_S_GIORNI_VALS(i) := i
+end-do
+
+declarations
+    id_csv, id_soluzioni: integer
+end-declarations
+
+! Apri entrambi i file e cattura i loro ID
+fopen("risultati_test_finestra.csv", F_OUTPUT)
+id_csv := getfid(F_OUTPUT)
+
+fopen("soluzioni_test_finestra.txt", F_OUTPUT)
+id_soluzioni := getfid(F_OUTPUT)
+
+fselect(id_csv)
+! Intestazione CSV aggiornata con s_giorni e s_turni
+writeln("k_turni,s_giorni,s_turni,sigma,delta,costo_ottimo,n_coppie_vicine,n_quartieri_coperti")
+
+! -----------------------------------------------------------------------
+! LOOP PARAMETRICO COMPLETO
+! -----------------------------------------------------------------------
+forall(k in 1..N_K_TURNI) do
+    forall(sg in 1..N_S_GIORNI) do
+        s_giorni := N_S_GIORNI_VALS(sg)
+        
+        ! st va da 1 a s_giorni (evita che per s_giorni=1 il ciclo sia vuoto 1..0)
+        forall(st in 1..s_giorni) do
+            s_turni := st
+            
+            forall(si in 1..N_SIGMA) do
+                forall(di in 1..N_DELTA) do
+
+                    ! 1. Aggiorna parametri globali
+                    sigma := SIGMA_VALS(si)
+                    delta := DELTA_VALS(di)
+                    k_turni := K_TURNI_VALS(k)
+
+                    ! 2. Ricalcola copertura e costi
+                    forall(q in Q, f in F)
+                        copertura(q,f) := if(t_dist(f,q) <= sigma, 1, 0)
+                    
+                    ! CONTROLLO PREVENTIVO INFEASIBILITY SULLA COPERTURA
+                    is_infeasible := false
+                    forall(q in Q) do
+                        if sum(f in F) copertura(q,f) = 0 then
+                            is_infeasible := true
+                            break
+                        end-if
+                    end-do
+                    
+                    if is_infeasible then
+                        fselect(id_soluzioni)
+                        writeln("k_turni=", k_turni, " s_giorni=", s_giorni, " s_turni=", s_turni, " sigma=", sigma, " delta=", delta, ": Infeasible per copertura mancante. Salto.\n")
+                        next ! Salta al ciclo successivo
+                    end-if
+
+                    n_coppie := 0
+                    forall(f in F, g in F | f < g) do
+                        if pi_dist(f,g) < delta then
+                            costo(f,g) := delta - pi_dist(f,g)
+                            n_coppie += 1
+                        else
+                            costo(f,g) := 0
+                        end-if
+                    end-do
+
+                    ! Reset delle variabili dinamiche e vincoli ad ogni ciclo
+                    reset(y)
+                    reset(VincoloSliding)
+                    reset(VincoloLinearizz)
+
+                    forall(f in F, h in H) x(f,h) is_binary
+
+                    ! Creazione delle y per le coppie con costo > 0
+                    forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
+                        create(y(f,g,h))
+                        y(f,g,h) is_binary
+                    end-do
+                    
+                    ! 3. Assegnazione e sovrascrittura sicura dei vincoli
+                    
+                    ! Copertura
+                    forall(q in Q, h in H) do
+                        VincoloCopertura(q,h) := sum(f in F | copertura(q,f) = 1) x(f,h) >= 1
+                    end-do
+                    
+                    ! Turnistica totale
+                    forall(f in F) do
+                        VincoloTurniTotali(f) := sum(h in H) x(f,h) <= k_turni
+                    end-do
+                    
+                    ! Turnistica sliding window
+                    if s_giorni < n_giorni then
+                        forall(f in F, inizio in 1..(n_giorni - s_giorni + 1)) do
+                           VincoloSliding(f, inizio) := sum(h in inizio..(inizio + s_giorni - 1)) x(f,h) <= s_turni
+                        end-do
+                    end-if
+                    
+                    ! Linearizzazione
+                    forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
+                        VincoloLinearizz(f,g,h) := y(f,g,h) >= x(f,h) + x(g,h) - 1
+                    end-do
+
+                    ! 4. Risoluzione
+                    obiettivo := sum(f, g in F, h in H | f < g and costo(f,g) > 0) (costo(f,g) * y(f,g,h))
+                    minimize(obiettivo)
+
+                    if getprobstat = XPRS_INF or getprobstat <> XPRS_OPT then
+                        fselect(id_soluzioni)
+                        writeln("k_turni=", k_turni, " s_giorni=", s_giorni, " s_turni=", s_turni, " sigma=", sigma, " delta=", delta, ": Infeasible dal solutore. Salto.\n")
+                        next
+                    end-if
+
+                    costo_ottimo := getobjval
+                    
+                    ! Stampa soluzioni sul file .txt
+                    fselect(id_soluzioni)
+                    writeln("\n--- RISULTATI OTTIMIZZAZIONE k_turni=", k_turni, " s_giorni=", s_giorni, " s_turni=", s_turni, " sigma=", sigma, " delta=", delta, " ---")
+                    writeln("Status soluzione: ", getprobstat)
+                    writeln("Costo totale: ", getobjval)
+                    
+                    forall(h in H) do
+                        write("Giorno ", h, "\t-> Farmacie aperte: ")
+                        forall(f in F) do
+                            if getsol(x(f,h)) = 1 then
+                                write("F", f, " ")
+                            end-if
+                        end-do
+                        writeln("")
+                    end-do
+
+                    ! 5. Conta quartieri coperti al giorno 1
+                    n_coperti := 0
+                    forall(q in Q) do
+                        if getsol(sum(f in F) copertura(q,f) * x(f,1)) >= 1 then
+                            n_coperti += 1
+                        end-if
+                    end-do
+
+                    ! 6. Scrivi riga completa nel CSV
+                    fselect(id_csv)
+                    writeln(k_turni, ",", s_giorni, ",", s_turni, ",", sigma, ",", delta, ",", costo_ottimo, ",", n_coppie, ",", n_coperti)
+
+                end-do  ! fine loop delta
+            end-do    ! fine loop sigma
+        end-do        ! fine loop s_turni
+    end-do            ! fine loop s_giorni 
+end-do               ! fine loop k_turni
+
+! Chiudi i file
+fclose(id_csv)
+fclose(id_soluzioni)
+writeln("Fine. Risultati salvati in: risultati_test_finestra.csv e soluzioni_test_finestra.txt")
+
+end-model
