@@ -17,15 +17,16 @@ model "test"
 declarations
     n_quartieri: integer
     n_farmacie: integer
-    n_giorni: integer
 
     k_turni: integer
     s_giorni: integer
     s_turni: integer
+    
+    n_giorni = 30
 end-declarations
 
 initializations from "datafile.dat"
-    n_quartieri n_farmacie n_giorni
+    n_quartieri n_farmacie
     k_turni s_giorni s_turni
 end-initializations
 
@@ -54,11 +55,13 @@ initializations from "datafile.dat"
 end-initializations
 
 declarations
-    N_SIGMA = 1
-    N_DELTA = 1
+    N_SIGMA = 50
+    N_DELTA = 50
+    N_K_TURNI = 30
 
     SIGMA_VALS : array(1..N_SIGMA) of real
     DELTA_VALS : array(1..N_DELTA) of real
+    K_TURNI_VALS : array(1..N_K_TURNI) of integer
     
     sigma: real
     delta: real
@@ -68,9 +71,15 @@ declarations
     n_coperti    : integer
 end-declarations
 
-! Valori della griglia
-SIGMA_VALS(1) := 2.0
-DELTA_VALS(1) := 1.0
+! Generazione dinamica dei valori
+forall(i in 1..N_SIGMA) do
+  SIGMA_VALS(i) := i * 0.1
+  DELTA_VALS(i) := i * 0.1
+end-do
+
+forall(i in 1..N_K_TURNI) do
+  K_TURNI_VALS(i) := 31 - i
+end-do
 
 declarations
     id_csv, id_soluzioni: integer
@@ -84,95 +93,117 @@ fopen("soluzioni_test.txt", F_OUTPUT)
 id_soluzioni := getfid(F_OUTPUT)
 
 fselect(id_csv)
-writeln("sigma,delta,costo_ottimo,n_coppie_vicine,n_quartieri_coperti")
+writeln("k_turni,sigma,delta,costo_ottimo,n_coppie_vicine,n_quartieri_coperti")
 
 ! -----------------------------------------------------------------------
 ! DOPPIO LOOP: sigma fisso, delta scorre; poi sigma avanza
 ! -----------------------------------------------------------------------
-forall(si in 1..N_SIGMA) do
-    forall(di in 1..N_DELTA) do
-
-        ! 1. Aggiorna parametri globali usati dal modello
-        sigma := SIGMA_VALS(si)
-        delta := DELTA_VALS(di)
-
-        ! 2. Ricalcola copertura e costi con i nuovi sigma/delta
-        forall(q in Q, f in F)
-            copertura(q,f) := if(t_dist(f,q) <= sigma, 1, 0)
-
-        n_coppie := 0
-        forall(f in F, g in F | f < g) do
-            if pi_dist(f,g) < delta then
-                costo(f,g) := delta - pi_dist(f,g)
-                n_coppie += 1
-            else
-                costo(f,g) := 0
-            end-if
-        end-do
-
-        forall(f in F, h in H) x(f,h) is_binary
-
-        ! Creazione delle y per le coppie che generano costo > 0
-        forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
-            create(y(f,g,h))
-            y(f,g,h) is_binary
-        end-do
-        
-        ! Copertura
-		forall(q in Q, h in H) do
-		    sum(f in F | copertura(q,f) = 1) x(f,h) >= 1
-		end-do
-		
-		! Turnistica - non sliding window
-		forall(f in F) do
-		    sum(h in H) x(f,h) <= k_turni
-		end-do
-		
-		! Linearizzazione
-		forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
-		    y(f,g,h) >= x(f,h) + x(g,h) - 1
-		end-do
-
-        ! 4. Risolvi
-        obiettivo := sum(f, g in F, h in H | f < g and costo(f,g) > 0) (costo(f,g) * y(f,g,h))
-        minimize(obiettivo)
-        costo_ottimo := getobjval
-        
-        fselect(id_soluzioni)
-        
-        writeln("\n--- RISULTATI OTTIMIZZAZIONE sigma = ", sigma, ", delta = ", delta, " ---")
-		writeln("Status soluzione: ", getprobstat)
-		writeln("Costo totale (funzione obiettivo): ", getobjval)
-		writeln("")
-		
-		! Stampa per giornate
-		forall(h in H) do
-		    write("Giorno ", h, "\t-> Farmacie aperte: ")
-		    forall(f in F) do
-		        if getsol(x(f,h)) = 1 then
-		            write("F", f, " ")
-		        end-if
-		    end-do
-		    writeln("")
-		end-do
-		
-		writeln("")
-
-        ! 5. Conta quartieri effettivamente coperti al giorno 1
-        n_coperti := 0
-        forall(q in Q) do
-            if getsol(sum(f in F) copertura(q,f) * x(f,1)) >= 1 then
-                n_coperti += 1
-            end-if
-        end-do
-
-        ! 6. Scrivi riga nel CSV
-        fselect(id_csv)
-        writeln(sigma, ",", delta, ",", costo_ottimo, ",", n_coppie, ",", n_coperti)
-
-    end-do  ! fine loop delta
-end-do    ! fine loop sigma
-
+forall(k in 1..N_K_TURNI) do
+	forall(si in 1..N_SIGMA) do
+	    forall(di in 1..N_DELTA) do
+	
+	        ! 1. Aggiorna parametri globali usati dal modello
+	        sigma := SIGMA_VALS(si)
+	        delta := DELTA_VALS(di)
+	        k_turni := K_TURNI_VALS(k)
+	
+	        ! 2. Ricalcola copertura e costi con i nuovi sigma/delta
+	        forall(q in Q, f in F)
+	            copertura(q,f) := if(t_dist(f,q) <= sigma, 1, 0)
+	            
+	        ! CONTROLLO PREVENTIVO INFEASIBILITY SULLA COPERTURA
+			! Se esiste anche solo un q non copribile da nessun f, il problema è impossibile.
+			is_infeasible := false
+			forall(q in Q) do
+			    if sum(f in F) copertura(q,f) = 0 then
+			        is_infeasible := true
+			        break
+			    end-if
+			end-do
+			
+			if is_infeasible then
+			    writeln("k_turni = ", k_turni, "sigma = ", sigma, ", delta = ", delta,": problema non ammissibile (infeasible). Salto.\n")
+			    next ! Salta al ciclo successivo senza generare vincoli errati
+			end-if
+	
+	        n_coppie := 0
+	        forall(f in F, g in F | f < g) do
+	            if pi_dist(f,g) < delta then
+	                costo(f,g) := delta - pi_dist(f,g)
+	                n_coppie += 1
+	            else
+	                costo(f,g) := 0
+	            end-if
+	        end-do
+	
+	        forall(f in F, h in H) x(f,h) is_binary
+	
+	        ! Creazione delle y per le coppie che generano costo > 0
+	        forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
+	            create(y(f,g,h))
+	            y(f,g,h) is_binary
+	        end-do
+	        
+	        ! Copertura
+			forall(q in Q, h in H) do
+			    sum(f in F | copertura(q,f) = 1) x(f,h) >= 1
+			end-do
+			
+			! Turnistica - non sliding window
+			forall(f in F) do
+			    sum(h in H) x(f,h) <= k_turni
+			end-do
+			
+			! Linearizzazione
+			forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
+			    y(f,g,h) >= x(f,h) + x(g,h) - 1
+			end-do
+	
+	        ! 4. Risolvi
+	        obiettivo := sum(f, g in F, h in H | f < g and costo(f,g) > 0) (costo(f,g) * y(f,g,h))
+	        minimize(obiettivo)
+	        if getprobstat = XPRS_INF or getprobstat <> XPRS_OPT then
+			  	writeln("k_turni = ", k_turni, "sigma = ", sigma, ", delta = ", delta,": problema non ammissibile (infeasible). Salto.\n")
+			    next  ! Salta il resto del blocco e passa alla prossima iterazione
+			end-if
+	        costo_ottimo := getobjval
+	        
+	        fselect(id_soluzioni)
+	        
+	        writeln("\n--- RISULTATI OTTIMIZZAZIONE k_turni = ", k_turni, "sigma = ", sigma, ", delta = ", delta, " ---")
+			writeln("Status soluzione: ", getprobstat)
+			writeln("Costo totale (funzione obiettivo): ", getobjval)
+			writeln("")
+			
+			! Stampa per giornate
+			forall(h in H) do
+			    write("Giorno ", h, "\t-> Farmacie aperte: ")
+			    forall(f in F) do
+			        if getsol(x(f,h)) = 1 then
+			            write("F", f, " ")
+			        end-if
+			    end-do
+			    writeln("")
+			end-do
+			
+			writeln("")
+	
+	        ! 5. Conta quartieri effettivamente coperti al giorno 1
+	        n_coperti := 0
+	        forall(q in Q) do
+	            if getsol(sum(f in F) copertura(q,f) * x(f,1)) >= 1 then
+	                n_coperti += 1
+	            end-if
+	        end-do
+	
+	        ! 6. Scrivi riga nel CSV
+	        fselect(id_csv)
+	        writeln(k_turni, ",",sigma, ",", delta, ",", costo_ottimo, ",", n_coppie, ",", n_coperti)
+	
+	    end-do  ! fine loop delta
+	end-do    ! fine loop sigma
+end-do 	! fine loop k_turni
+	
 ! Chiudi il file CSV e ripristina lo standard output sul terminale
 fclose(id_csv)
 fclose(id_soluzioni)
