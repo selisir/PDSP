@@ -3,48 +3,45 @@
   --------------------
   Test parametrico senza sliding window: risolve il PDSP per ogni combinazione
   (k_turni, sigma, delta) e salva costo ottimo + statistiche su CSV.
-
-  Limite licenza Community di Xpress: righe + colonne <= 5000.
-  - Si calcola prima fino a quale delta il problema ci sta.
-  - y(f,g,h) e i vincoli di linearizzazione (che NON dipendono da delta)
-    vengono creati UNA SOLA VOLTA per tutte le coppie con pi < delta_max.
-    Cambia solo l'obiettivo: i costi delta - pi(f,g) valgono 0 per le coppie
-    non vicine, quindi il risultato e' identico ma il modello non si
-    ricostruisce (e non accumula niente) a ogni delta.
-  - Per i delta oltre il limite: banner e NA nel CSV.
 !)
 
 model "test"
   uses "mmxprs", "mmsystem"
 
+! =========================================================================
+! BLOCCO 1: dimensioni e parametri
+! =========================================================================
 declarations
     n_quartieri: integer
     n_farmacie: integer
 
     n_giorni = 30
-    LIMITE   = 4900      ! limite licenza (5000) con un po' di margine
 end-declarations
 
 initializations from "datafile.dat"
     n_quartieri n_farmacie
 end-initializations
 
+! =========================================================================
+! BLOCCO 2: insiemi e strutture dati
+! =========================================================================
 declarations
     Q = 1..n_quartieri
     F = 1..n_farmacie
     H = 1..n_giorni
 
-    t_dist: array(F, Q) of real
-    pi_dist: array(F, F) of real
+    t_dist: array(F, Q) of real   ! distanza t_{fq} tra farmacia e quartiere
+    pi_dist: array(F, F) of real  ! distanza pi_{fg} tra farmacia e farmacia
 
-    copertura: array(Q, F) of integer
-    costo: array(F, F) of real
+    copertura: array(Q, F) of integer  ! 1 se t(f,q) <= sigma, 0 altrimenti
+    costo: array(F, F) of real         ! delta - pi(f,g) se pi(f,g) < delta, 0 altrimenti
 
-    x: array(F, H) of mpvar
-    y: dynamic array(F, F, H) of mpvar
+    x: array(F, H) of mpvar            ! x(f,h)=1 se farmacia f e' di turno il giorno h
+    y: dynamic array(F, F, H) of mpvar ! variabile di linearizzazione
+    
+    obiettivo: linctr                  ! funzione obiettivo
 
-    obiettivo: linctr
-
+    ! DICHIARAZIONE ESPLICITA DEI VINCOLI (evita l'accumulo anonimo)
     VincoloCopertura: array(Q, H) of linctr
     VincoloTurniTotali: array(F) of linctr
     VincoloLinearizz: dynamic array(F, F, H) of linctr
@@ -62,24 +59,20 @@ declarations
     SIGMA_VALS : array(1..N_SIGMA) of real
     DELTA_VALS : array(1..N_DELTA) of real
     K_TURNI_VALS : array(1..N_K_TURNI) of integer
-
-    sigma, delta, delta_max: real
+    
+    ! DICHIARAZIONE VARIABILI DI CICLO
+    sigma, delta: real
     k_turni: integer
     is_infeasible: boolean
 
     costo_ottimo : real
     n_coppie     : integer
     n_coperti    : integer
-    n_coppie_max : integer
-
-    dim_stimata  : integer
-    n_delta_ok   : integer
-    trovato_limite: boolean
-    n_saltati    : integer
-
-    id_csv, id_soluzioni, id_console: integer
+    
+    id_csv, id_soluzioni: integer
 end-declarations
 
+! Generazione dinamica dei valori
 forall(i in 1..N_SIGMA) do
   SIGMA_VALS(i) := i * 0.1
   DELTA_VALS(i) := i * 0.1
@@ -89,153 +82,53 @@ forall(i in 1..N_K_TURNI) do
   K_TURNI_VALS(i) := 31 - i
 end-do
 
-id_console := getfid(F_OUTPUT)
-
+! Apertura file
 fopen("risultati_test.csv", F_OUTPUT)
 id_csv := getfid(F_OUTPUT)
 
 fopen("soluzioni_test.txt", F_OUTPUT)
 id_soluzioni := getfid(F_OUTPUT)
 
+! Scrittura intestazione CSV
 fselect(id_csv)
 writeln("k_turni,sigma,delta,costo_ottimo,n_coppie_vicine,n_quartieri_coperti")
-
-! =========================================================================
-! Fino a quale delta si puo' arrivare con il limite della licenza?
-! =========================================================================
-n_delta_ok := 0
-trovato_limite := false
-
-forall(di in 1..N_DELTA) do
-    n_coppie := 0
-    forall(f in F, g in F | f < g)
-        if pi_dist(f,g) < DELTA_VALS(di) then
-            n_coppie += 1
-        end-if
-
-    dim_stimata := n_quartieri*n_giorni + n_farmacie + n_farmacie*n_giorni + 2*n_coppie*n_giorni
-
-    if dim_stimata > LIMITE then
-        trovato_limite := true
-        break
-    end-if
-    n_delta_ok := di
-end-do
-
-fselect(id_console)
-writeln("==========================================================")
-writeln(" LIMITE LICENZA: righe + colonne <= ", LIMITE)
-if n_delta_ok = 0 then
-    writeln(" Nessun valore di delta rientra nel limite: nulla da risolvere.")
-elif trovato_limite then
-    writeln(" Risolvo per delta da ", DELTA_VALS(1), " a ", DELTA_VALS(n_delta_ok))
-    writeln(" Per delta >= ", DELTA_VALS(n_delta_ok+1), " il problema e' troppo grande: NON risolvibile")
-else
-    writeln(" Tutti i valori di delta rientrano nel limite.")
-end-if
-writeln("==========================================================")
-
-fselect(id_soluzioni)
-writeln("Limite licenza: delta risolvibili = 1..", n_delta_ok, " su ", N_DELTA)
-
-! =========================================================================
-! Parte statica del modello, creata UNA volta sola
-! =========================================================================
-if n_delta_ok > 0 then
-    delta_max := DELTA_VALS(n_delta_ok)
-
-    n_coppie_max := 0
-    forall(f in F, g in F | f < g)
-        if pi_dist(f,g) < delta_max then
-            n_coppie_max += 1
-        end-if
-    dim_stimata := n_quartieri*n_giorni + n_farmacie + n_farmacie*n_giorni + 2*n_coppie_max*n_giorni
-
-    forall(f in F, h in H) x(f,h) is_binary
-
-    ! y continua in [0,1]: con costi >= 0 e minimizzazione vale comunque 0/1
-    forall(f, g in F, h in H | f < g and pi_dist(f,g) < delta_max) do
-        create(y(f,g,h))
-        y(f,g,h) <= 1
-        VincoloLinearizz(f,g,h) := y(f,g,h) >= x(f,h) + x(g,h) - 1
-    end-do
-end-if
-
-n_saltati := 0
 
 ! -----------------------------------------------------------------------
 ! TRIPLE LOOP: k_turni, sigma, delta
 ! -----------------------------------------------------------------------
 forall(k in 1..N_K_TURNI) do
     forall(si in 1..N_SIGMA) do
+        forall(di in 1..N_DELTA) do
 
-        sigma := SIGMA_VALS(si)
-        k_turni := K_TURNI_VALS(k)
-
-        forall(q in Q, f in F)
-            copertura(q,f) := if(t_dist(f,q) <= sigma, 1, 0)
-
-        is_infeasible := false
-        forall(q in Q) do
-            if sum(f in F) copertura(q,f) = 0 then
-                is_infeasible := true
-                break
-            end-if
-        end-do
-
-        if is_infeasible then
-            fselect(id_soluzioni)
-            writeln("k_turni = ", k_turni, ", sigma = ", sigma,
-                    ": Infeasible per assenza copertura (tutti i delta). Salto.")
-            next
-        end-if
-
-        ! Delta oltre il limite: banner e NA nel CSV
-        if n_delta_ok < N_DELTA then
-            fselect(id_console)
-            writeln("********************************************************")
-            writeln("* k_turni = ", k_turni, ", sigma = ", sigma)
-            if n_delta_ok = 0 then
-                writeln("* nessun delta risolvibile (limite licenza ", LIMITE, ")")
-            else
-                writeln("* delta da ", DELTA_VALS(n_delta_ok+1), " a ", DELTA_VALS(N_DELTA),
-                        ": NON RISOLVIBILE (limite licenza ", LIMITE, ")")
-            end-if
-            writeln("********************************************************")
-
-            fselect(id_soluzioni)
-            writeln("k_turni = ", k_turni, ", sigma = ", sigma, ", delta da ",
-                    DELTA_VALS(n_delta_ok+1), " a ", DELTA_VALS(N_DELTA),
-                    ": NON RISOLTO (problema troppo grande per la licenza).")
-
-            fselect(id_csv)
-            forall(di in (n_delta_ok+1)..N_DELTA)
-                writeln(k_turni, ",", sigma, ",", DELTA_VALS(di), ",NA,NA,NA")
-
-            n_saltati += N_DELTA - n_delta_ok
-        end-if
-
-        if n_delta_ok = 0 then
-            next
-        end-if
-
-        ! Vincoli che dipendono solo da (k_turni, sigma): ridefiniti una volta
-        ! per coppia, non per ogni delta
-        reset(VincoloCopertura)
-        reset(VincoloTurniTotali)
-
-        forall(q in Q, h in H) do
-            VincoloCopertura(q,h) := sum(f in F | copertura(q,f) = 1) x(f,h) >= 1
-        end-do
-
-        forall(f in F) do
-            VincoloTurniTotali(f) := sum(h in H) x(f,h) <= k_turni
-        end-do
-
-        forall(di in 1..n_delta_ok) do
-
+            ! 1. Aggiorna parametri globali
+            sigma := SIGMA_VALS(si)
             delta := DELTA_VALS(di)
+            k_turni := K_TURNI_VALS(k)
+            
+            fopen("", F_OUTPUT)
+            writeln("risolvo")
+            writeln("")
 
+            ! 2. Ricalcola copertura
+            forall(q in Q, f in F)
+                copertura(q,f) := if(t_dist(f,q) <= sigma, 1, 0)
+            
+            ! CONTROL PREVENTIVO COPERTURA
+            is_infeasible := false
+            forall(q in Q) do
+                if sum(f in F) copertura(q,f) = 0 then
+                    is_infeasible := true
+                    break
+                end-if
+            end-do
+            
+            if is_infeasible then
+                fselect(id_soluzioni)
+                writeln("k_turni = ", k_turni, ", sigma = ", sigma, ", delta = ", delta, ": Infeasible per assenza copertura. Salto.")
+                next
+            end-if
+
+            ! 3. Calcolo costi e reset variabili/vincoli dinamici
             n_coppie := 0
             forall(f in F, g in F | f < g) do
                 if pi_dist(f,g) < delta then
@@ -246,31 +139,54 @@ forall(k in 1..N_K_TURNI) do
                 end-if
             end-do
 
-            ! Cambia solo l'obiettivo
+            reset(y)
+            reset(VincoloLinearizz)
+
+            forall(f in F, h in H) x(f,h) is_binary
+
+            ! Creazione delle y per le coppie valide
+            forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
+                create(y(f,g,h))
+                y(f,g,h) is_binary
+            end-do
+            
+            ! 4. Definizione e Sovrascrittura dei Vincoli
+            forall(q in Q, h in H) do
+                VincoloCopertura(q,h) := sum(f in F | copertura(q,f) = 1) x(f,h) >= 1
+            end-do
+            
+            forall(f in F) do
+                VincoloTurniTotali(f) := sum(h in H) x(f,h) <= k_turni
+            end-do
+            
+            forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
+                VincoloLinearizz(f,g,h) := y(f,g,h) >= x(f,h) + x(g,h) - 1
+            end-do
+
+            ! 5. Risoluzione
             obiettivo := sum(f, g in F, h in H | f < g and costo(f,g) > 0) (costo(f,g) * y(f,g,h))
-
-            fselect(id_console)
-            writeln("  -> k_turni=", k_turni, " sigma=", sigma, " delta=", delta,
-                    " coppie=", n_coppie, " dimensione modello=", dim_stimata)
-
             minimize(obiettivo)
-
-            if getprobstat <> XPRS_OPT then
+            
+            if getprobstat = XPRS_INF or getprobstat <> XPRS_OPT then
                 fselect(id_soluzioni)
-                writeln("k_turni = ", k_turni, ", sigma = ", sigma, ", delta = ", delta,
-                        ": Non ottimo/ammissibile dal solutore (stato ", getprobstat, "). Salto.")
-                fselect(id_csv)
-                writeln(k_turni, ",", sigma, ",", delta, ",NA,", n_coppie, ",NA")
+                writeln("k_turni = ", k_turni, ", sigma = ", sigma, ", delta = ", delta, ": Non ammissibile dal solutore. Salto.")
                 next
             end-if
 
             costo_ottimo := getobjval
-
+            
+            fopen("", F_OUTPUT)
+            writeln("\n--- RISULTATI OTTIMIZZAZIONE k_turni = ", k_turni, ", sigma = ", sigma, ", delta = ", delta, " ---")
+            writeln("Status soluzione: ", getprobstat)
+            writeln("Costo totale: ", getobjval)
+            writeln("")
+            
+            ! 6. Scrittura dettagli in soluzioni_test.txt
             fselect(id_soluzioni)
             writeln("\n--- RISULTATI OTTIMIZZAZIONE k_turni = ", k_turni, ", sigma = ", sigma, ", delta = ", delta, " ---")
             writeln("Status soluzione: ", getprobstat)
             writeln("Costo totale: ", getobjval)
-
+            
             forall(h in H) do
                 write("Giorno ", h, "\t-> Farmacie aperte: ")
                 forall(f in F) do
@@ -281,6 +197,7 @@ forall(k in 1..N_K_TURNI) do
                 writeln("")
             end-do
 
+            ! 7. Conteggio quartieri coperti al giorno 1
             n_coperti := 0
             forall(q in Q) do
                 if (sum(f in F) copertura(q,f) * getsol(x(f,1))) >= 1 then
@@ -288,6 +205,7 @@ forall(k in 1..N_K_TURNI) do
                 end-if
             end-do
 
+            ! 8. Scrittura riga nel CSV
             fselect(id_csv)
             writeln(k_turni, ",", sigma, ",", delta, ",", costo_ottimo, ",", n_coppie, ",", n_coperti)
 
@@ -295,14 +213,9 @@ forall(k in 1..N_K_TURNI) do
     end-do    ! fine loop sigma
 end-do     ! fine loop k_turni
 
+! Chiudi i file
 fclose(id_csv)
 fclose(id_soluzioni)
-
-fselect(id_console)
-writeln("==========================================================")
-writeln(" Esecuzione completata.")
-writeln(" Combinazioni NON risolte per limite licenza: ", n_saltati)
-writeln(" Risultati in risultati_test.csv (NA = non risolto)")
-writeln("==========================================================")
+writeln("Esecuzione completata. Risultati salvati correttamente.")
 
 end-model
