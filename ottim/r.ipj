@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ive_project expanded="0" version="1.0">
+	<files/>
+	<options>
+		<drawsimplex value="1"/>
+		<ifpause value="0"/>
+		<drawmip value="1"/>
+		<drawbar value="1"/>
+		<ifpausebar value="0"/>
+		<ifpausemip value="0"/>
+		<parameters value=""/>
+		<useparameters value="1"/>
+		<ifshowmatrix value="0"/>
+		<ifshowpresmatrix value="0"/>
+		<drawbb value="1"/>
+		<enablehighlight value="1"/>
+		<ifmanualtree value="0"/>
+		<ifsketchmatrix value="1"/>
+		<ifthumbmatrix value="0"/>
+		<cpnodelimit value="100"/>
+		<cpstoredomains value="0"/>
+		<cpdrawtree value="1"/>
+	</options>
+</ive_project>
