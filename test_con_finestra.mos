@@ -52,11 +52,15 @@ initializations from "datafile.dat"
     t_dist pi_dist
 end-initializations
 
+(!--- RISULTATI OTTIMIZZAZIONE k_turni=5 s_giorni=3 s_turni=1 sigma=3 delta=3 ---
+Status soluzione: 2
+Costo totale: 0.595!)
+
 declarations
-    N_SIGMA = 50
-    N_DELTA = 50
-    N_K_TURNI = 30 ! numero turni max totali
-    N_S_GIORNI = 30 ! grandezza finestra 
+    N_SIGMA = 3
+    N_DELTA = 3
+    N_K_TURNI = 5 ! numero turni max totali
+    N_S_GIORNI = 6 ! grandezza finestra 
     N_S_TURNI = 30 ! numero turni max per finestra
 
     SIGMA_VALS : array(1..N_SIGMA) of real
@@ -74,20 +78,17 @@ declarations
     n_coperti    : integer
 end-declarations
 
+K_TURNI_VALS :: [5, 7, 10, 15, 20]
+N_S_GIORNI_VALS :: [3, 5, 7, 10, 15, 20]
+
 ! Generazione dinamica dei valori
-forall(i in 1..N_SIGMA) do
-  SIGMA_VALS(i) := i * 0.1
-  DELTA_VALS(i) := i * 0.1
+cont := 2.5
+forall(i in 1..N_DELTA) do
+  	SIGMA_VALS(i) := cont
+  	DELTA_VALS(i) := cont
+  	cont := cont + 0.5
 end-do
 
-forall(i in 1..N_K_TURNI) do
-  K_TURNI_VALS(i) := 31 - i
-end-do
-
-! Popolamento dell'array N_S_GIORNI_VALS (prima mancava!)
-forall(i in 1..N_S_GIORNI) do
-  N_S_GIORNI_VALS(i) := i
-end-do
 
 declarations
     id_csv, id_soluzioni: integer
@@ -115,8 +116,7 @@ forall(k in 1..N_K_TURNI) do
     forall(sg in 1..N_S_GIORNI) do
         s_giorni := N_S_GIORNI_VALS(sg)
         
-        ! st va da 1 a s_giorni (evita che per s_giorni=1 il ciclo sia vuoto 1..0)
-        forall(st in 1..s_giorni) do
+        forall(st in 1..s_giorni - 1) do
             s_turni := st
             
             forall(si in 1..N_SIGMA) do
@@ -145,6 +145,8 @@ forall(k in 1..N_K_TURNI) do
                     end-do
                     
                     if is_infeasible then
+                    	fopen("", F_OUTPUT)
+                    	writeln("k_turni=", k_turni, " s_giorni=", s_giorni, " s_turni=", s_turni, " sigma=", sigma, " delta=", delta, ": Infeasible per copertura mancante. Salto.\n")
                         fselect(id_soluzioni)
                         writeln("k_turni=", k_turni, " s_giorni=", s_giorni, " s_turni=", s_turni, " sigma=", sigma, " delta=", delta, ": Infeasible per copertura mancante. Salto.\n")
                         next ! Salta al ciclo successivo
@@ -199,12 +201,23 @@ forall(k in 1..N_K_TURNI) do
 
                     ! 4. Risoluzione
                     obiettivo := sum(f, g in F, h in H | f < g and costo(f,g) > 0) (costo(f,g) * y(f,g,h))
+                    setparam("XPRS_MAXTIME", 300)
                     minimize(obiettivo)
 
-                    if getprobstat = XPRS_INF or getprobstat <> XPRS_OPT then
+                    if getprobstat = XPRS_INF then
+                    	fopen("", F_OUTPUT)
+                    	writeln("k_turni=", k_turni, " s_giorni=", s_giorni, " s_turni=", s_turni, " sigma=", sigma, " delta=", delta, ": Infeasible dal solutore. Salto.\n")
                         fselect(id_soluzioni)
                         writeln("k_turni=", k_turni, " s_giorni=", s_giorni, " s_turni=", s_turni, " sigma=", sigma, " delta=", delta, ": Infeasible dal solutore. Salto.\n")
                         next
+                    end-if
+                    
+                    if getprobstat = XPRS_UNF then
+                    	fopen("", F_OUTPUT)
+                        writeln("ATTENZIONE: Risoluzione interrotta per TIMEOUT. Salvo la best solution trovata.")
+                    	fselect(id_soluzioni)
+                    	writeln("k_turni=", k_turni, " s_giorni=", s_giorni, " s_turni=", s_turni, " sigma=", sigma, " delta=", delta, "\n")
+                    	writeln("ATTENZIONE: Risoluzione interrotta per TIMEOUT. Salvo la best solution trovata.")
                     end-if
 
                     costo_ottimo := getobjval
