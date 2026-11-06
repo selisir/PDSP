@@ -25916,4 +25916,41 @@ k_turni=0 s_giorni=5 s_turni=4 sigma=2.5 delta=3: Infeasible dal solutore. Salto
 
 k_turni=0 s_giorni=5 s_turni=4 sigma=2.5 delta=3.5: Infeasible dal solutore. Salto.
 
-k_turni=0 s_giorni=5 s_turni=4 sigma=3 
+k_turni=0 s_giorni=5 s_turni=4 sigma=3 delta=2.5: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=5 s_turni=4 sigma=3 delta=3: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=5 s_turni=4 sigma=3 delta=3.5: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=5 s_turni=4 sigma=3.5 delta=2.5: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=5 s_turni=4 sigma=3.5 delta=3: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=5 s_turni=4 sigma=3.5 delta=3.5: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=7 s_turni=1 sigma=2.5 delta=2.5: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=7 s_turni=1 sigma=2.5 delta=3: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=7 s_turni=1 sigma=2.5 delta=3.5: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=7 s_turni=1 sigma=3 delta=2.5: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=7 s_turni=1 sigma=3 delta=3: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=7 s_turni=1 sigma=3 delta=3.5: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=7 s_turni=1 sigma=3.5 delta=2.5: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=7 s_turni=1 sigma=3.5 delta=3: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=7 s_turni=1 sigma=3.5 delta=3.5: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=7 s_turni=2 sigma=2.5 delta=2.5: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=7 s_turni=2 sigma=2.5 delta=3: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=7 s_turni=2 sigma=2.5 delta=3.5: Infeasible dal solutore. Salto.
+
+k_turni=0 s_giorni=7 s_turni=2 sigma=3 delta=2.5: Infeasible dal solutore. Salto.
+
