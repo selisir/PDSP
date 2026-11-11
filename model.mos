@@ -120,8 +120,8 @@ end-do
 
 ! SIMMETRIA
 (!
-forall(h in 1..n_giorni-1) do
-    sum(f in F) f * x(f, h) <= sum(f in F) f * x(f, h + 1)
+forall(h,i in 1..n_giorni-1 | h<i) do
+    sum(f in F) f * x(f, h) <= sum(f in F) f * x(f, i)
 end-do
 !)
 
@@ -141,6 +141,7 @@ writeln("\nPERFORMANCE SOLUTORE")
 writeln("Tempo di risoluzione : ", tempo_esecuzione, " secondi")
 writeln("Nodi esplorati       : ", nodi_esplorati)
 writeln("Iterazioni simplesso : ", getparam("XPRS_SIMPLEXITER"))
+
 
 ! STAMPA COPERTURA QUARTIERI
 

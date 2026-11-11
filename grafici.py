@@ -1,9 +1,8 @@
 """
 Generatore Grafici Analisi Finestra - Stile PDSP.
-Nessuna dipendenza esterna necessaria se non pandas e matplotlib.
 
 Uso:   pip install pandas matplotlib
-       python grafici_finestra_pdsp.py
+       python grafici.py
 Output: cartella ./grafici_pdsp_finestra con i 3 grafici in PNG e PDF,
         senza sfondo (trasparenti), senza titoli né etichette degli assi:
         solo legenda e numeri sul grafico.
@@ -11,6 +10,7 @@ Output: cartella ./grafici_pdsp_finestra con i 3 grafici in PNG e PDF,
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
+import sys
 
 OUT = Path("grafici_pdsp_finestra")
 OUT.mkdir(exist_ok=True)
@@ -41,32 +41,32 @@ def salva(fig, nome):
     plt.close(fig)
     print("Creato:", nome)
 
-def genera_dataset():
-    """Ricrea il dataset delle 324 combinazioni del test finestra."""
-    records = []
-    for k in [5, 10]:
-        for sg in [3, 5, 7, 10, 15, 20]:
-            for st in range(1, 4): 
-                for sig in [2.5, 3.0, 3.5]:
-                    for delt in [2.5, 3.0, 3.5]:
-                        status = 'Infeasible'
-                        cost = None
-                        if sg == 20: status = 'Infeasible'
-                        elif sig == 2.5: status = 'Infeasible'
-                        elif k == 5 and sig == 3.0:
-                            if delt == 2.5: status, cost = 'Ottimo (2)', 0.0
-                            elif delt == 3.0: status, cost = 'Ottimo (2)', 1.5
-                            elif delt == 3.5: status, cost = 'Timeout (4)', 8.0
-                        elif k == 5 and sig == 3.5: status, cost = 'Ottimo (2)', 0.0
-                        elif k == 10 and sg == 3 and sig == 3.0:
-                            if delt == 2.5: status, cost = 'Ottimo (2)', 0.0
-                            elif delt == 3.0: status, cost = 'Ottimo (2)', 0.0
-                            elif delt == 3.5: status, cost = 'Ottimo (2)', 4.66
-                        elif k == 10 and sig == 3.0: status = 'Infeasible'
-                        elif k == 10 and sig == 3.5: status, cost = 'Ottimo (2)', 0.0
-                        
-                        records.append({'k_turni': k, 's_giorni': sg, 's_turni': st, 'sigma': sig, 'delta': delt, 'status': status, 'costo': cost})
-    return pd.DataFrame(records)
+def carica_dati(csv_path):
+    """Legge e normalizza il dataset dal file CSV reale."""
+    path = Path(csv_path)
+    if not path.exists():
+        print(f"ERRORE: Impossibile trovare il file '{csv_path}'.")
+        sys.exit(1)
+        
+    df = pd.read_csv(path)
+    
+    # Normalizza le colonne in minuscolo
+    df.columns = [str(c).strip().lower() for c in df.columns]
+    
+    # Normalizza i valori dello status per i grafici
+    if 'status' in df.columns:
+        df['status'] = df['status'].astype(str)
+        mappatura = {
+            '2': 'Ottimo (2)', '2.0': 'Ottimo (2)', 'ottimo': 'Ottimo (2)',
+            '4': 'Timeout (4)', '4.0': 'Timeout (4)', 'timeout': 'Timeout (4)'
+        }
+        df['status'] = df['status'].replace(mappatura)
+        df.loc[~df['status'].isin(['Ottimo (2)', 'Timeout (4)']), 'status'] = 'Infeasible'
+        
+    if 'costo' in df.columns:
+        df['costo'] = pd.to_numeric(df['costo'], errors='coerce').fillna(0)
+        
+    return df
 
 def g1_esiti(df):
     etichette = ["Ottimo", "Limite di tempo", "Non ammissibile"]
@@ -112,9 +112,12 @@ def g3_successo(df):
     s_giorni = [3, 5, 7, 10, 15, 20]
     pos = range(len(s_giorni))
     
-    y25 = [df[(df['s_giorni']==sg) & (df['sigma']==2.5)]['status'].apply(lambda x: x != 'Infeasible').mean()*100 for sg in s_giorni]
-    y30 = [df[(df['s_giorni']==sg) & (df['sigma']==3.0)]['status'].apply(lambda x: x != 'Infeasible').mean()*100 for sg in s_giorni]
-    y35 = [df[(df['s_giorni']==sg) & (df['sigma']==3.5)]['status'].apply(lambda x: x != 'Infeasible').mean()*100 for sg in s_giorni]
+    df['status_clean'] = df['status'].astype(str).str.strip().str.lower()
+
+    # 2. Calcoliamo le percentuali in modo più leggibile ed efficiente
+    y25 = [df[(df['s_giorni'] == sg) & (df['sigma'] == 2.5)]['status_clean'].ne('infeasible').mean() * 100 for sg in s_giorni]
+    y30 = [df[(df['s_giorni'] == sg) & (df['sigma'] == 3.0)]['status_clean'].ne('infeasible').mean() * 100 for sg in s_giorni]
+    y35 = [df[(df['s_giorni'] == sg) & (df['sigma'] == 3.5)]['status_clean'].ne('infeasible').mean() * 100 for sg in s_giorni]
     
     fig, ax = plt.subplots(figsize=(9, 4.8))
     
@@ -134,8 +137,9 @@ def g3_successo(df):
     salva(fig, "3_successo_pdsp")
 
 if __name__ == "__main__":
-    print("Generazione dataset in corso...")
-    df = genera_dataset()
+    csv_file = sys.argv[1] if len(sys.argv) > 1 else "risultati_test_finestra_2_integrati.csv"
+    print(f"Lettura dati da {csv_file} in corso...")
+    df = carica_dati(csv_file)
     print("Creazione grafici...")
     g1_esiti(df)
     g2_costi(df)
