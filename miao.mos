@@ -10,10 +10,10 @@ model "test"
   uses "mmxprs", "mmsystem"
 
 parameters
-    K_MAX    = 23    ! primo k da risolvere
+    K_MAX    = 22    ! primo k da risolvere
     K_MIN    = 21    ! ultimo k da risolvere
-    SI_START = 1     ! indice sigma di ripartenza (solo per il primo k)
-    DI_START = 1     ! indice delta di ripartenza (solo per il primo k)
+    SI_START = 6     ! indice sigma di ripartenza (solo per il primo k)
+    DI_START = 2     ! indice delta di ripartenza (solo per il primo k)
 end-parameters
 
 declarations
