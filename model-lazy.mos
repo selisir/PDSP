@@ -1,31 +1,26 @@
 model "PDSP_Modello_Lazy"
 uses "mmxprs", "mmive"
 
-! =========================================================================
-! BLOCCO 1: dimensioni e parametri (uguale a non lazy)
-! =========================================================================
+
 declarations
     n_quartieri: integer
     n_farmacie: integer
-    n_giorni: integer ! Giorni totali
+    n_giorni: integer ! giorni totali
 
-    sigma: real       ! Raggio massimo di copertura quartiere-farmacia
-    delta: real       ! Raggio massimo di vicinanza farmacia-farmacia (penalita')
-    k_turni: integer  ! Numero massimo di turni consentiti
+    sigma: real       ! raggio massimo di copertura quartiere-farmacia
+    delta: real       ! raggio massimo di vicinanza farmacia-farmacia (penalita')
+    k_turni: integer  ! numero massimo di turni consentiti
     
-    s_giorni: integer ! Finestra sliding window
-    s_turni: integer  ! Numero turni massimi per sliding window
+    s_giorni: integer ! finestra sliding window
+    s_turni: integer  ! numero turni massimi per sliding window
                        
 end-declarations
 
-initializations from "datafile-argento.dat"
+initializations from "datafile.dat"
     n_quartieri n_farmacie n_giorni
     sigma delta k_turni s_giorni s_turni
 end-initializations
 
-! =========================================================================
-! BLOCCO 2: insiemi e strutture dati
-! =========================================================================
 declarations
     Q = 1..n_quartieri
     F = 1..n_farmacie
@@ -45,19 +40,17 @@ declarations
 
 end-declarations
 
-initializations from "datafile-argento.dat"
+initializations from "datafile.dat"
     t_dist pi_dist
 end-initializations
 
-! Controllo s_giorni
+! controllo s_giorni
 if s_giorni > n_giorni then
     writeln("ERRORE: s_giorni non puo' essere maggiore di n_giorni")
     exit(1)
 end-if
 
-! --- PRECALCOLO PARAMETRI ---
-
-! Matrice di copertura
+! matrice di copertura
 forall(f in F, q in Q) do
     if t_dist(f,q) <= sigma then
         copertura(q,f) := 1
@@ -66,7 +59,7 @@ forall(f in F, q in Q) do
     end-if
 end-do
 
-! Matrice dei costi (solo f < g)
+! matrice dei costi (solo f < g)
 forall(f, g in F | f < g) do
     if pi_dist(f,g) < delta then
         costo(f,g) := delta - pi_dist(f,g)
@@ -75,31 +68,31 @@ forall(f, g in F | f < g) do
     end-if
 end-do
 
-! Dominio variabili x
+! dominio variabili x
 forall(f in F, h in H) x(f,h) is_binary
 
-! --- VINCOLI ---
+! VINCOLI
 
-! Copertura
+! copertura
 forall(q in Q, h in H) do
     sum(f in F | copertura(q,f) = 1) x(f,h) >= 1
 end-do
 
-! Turnistica - sliding window
+! turnistica - sliding window
 if s_giorni < n_giorni then
     forall(f in F, inizio in 1..(n_giorni - s_giorni + 1)) do
        sum(h in inizio..(inizio + s_giorni - 1)) x(f,h) <= s_turni
     end-do
 end-if
 
-! Turnistica - non sliding window
+! turnistica - non sliding window
 forall(f in F) do
     sum(h in H) x(f,h) <= k_turni
 end-do
 
-! --- STAMPA COPERTURA QUARTIERI ---
+! STAMPA COPERTURA QUARTIERI
 
-writeln("\n--- COPERTURA PER QUARTIERE ---")
+writeln("\nCOPERTURA PER QUARTIERE")
 forall(q in Q) do
     write("Q", q, " -> ")
     n_aperte := 0
@@ -113,7 +106,7 @@ forall(q in Q) do
     writeln("")
 end-do
 
-writeln("\n--- FARMACIE SENZA COPERTURA (per scelta di sigma) ---")
+writeln("\nFARMACIE SENZA COPERTURA (per scelta di sigma)")
 writeln("sigma = ", sigma) 
 forall(f in F | sum(q in Q) copertura(q,f) = 0) do 
 	dmin := min(q in Q) t_dist(f,q)
@@ -122,13 +115,11 @@ end-do
 
 writeln("\n")
 
-IVEpause("Click on pause button to continue")
-
-! --- FUNZIONE OBIETTIVO ---
+! FUNZIONE OBIETTIVO
 
 F_Obiettivo := 0
 
-! --- GENERAZIONE DINAMICA DEI VINCOLI ---
+! GENERAZIONE DINAMICA DEI VINCOLI
 
 declarations
     n_iter: integer
@@ -140,7 +131,7 @@ end-declarations
 n_iter := 0
 vincoli_aggiunti_totali := 0
 
-writeln("--- INIZIO LOOP PROBLEMA RILASSATO ---")
+writeln("INIZIO LOOP PROBLEMA RILASSATO")
 
 repeat
     n_iter += 1
@@ -149,7 +140,7 @@ repeat
     trovata_violazione := false
     vincoli_aggiunti_iter := 0
     
-    ! Scansione violazioni: due farmacie aperte nello stesso giorno con costo > 0
+    ! scansione violazioni: due farmacie aperte nello stesso giorno con costo > 0
     forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
         if getsol(x(f,h)) + getsol(x(g,h)) > 1.5 and not exists(y(f,g,h)) then
         	create(y(f,g,h))
@@ -167,16 +158,16 @@ repeat
 
 until not trovata_violazione
 
-! --- STAMPA RISULTATI FINALI ---
+! STAMPA RISULTATI FINALI
 
-writeln("\n--- OTTIMO GLOBALE RAGGIUNTO ---")
+writeln("\nOTTIMO GLOBALE RAGGIUNTO")
 writeln("Iterazioni totali: ", n_iter)
 writeln("Variabili y generati: ", vincoli_aggiunti_totali)
 writeln("Costo totale (funzione obiettivo): ", getobjval)
 
 writeln("\n")
 
-! Stampa turni
+! stampa turni
 forall(h in H) do
     write("Giorno ", h, "\t-> Farmacie aperte: ")
     forall(f in F | getsol(x(f,h)) > 0.5) do

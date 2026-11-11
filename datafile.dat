@@ -12,8 +12,8 @@ delta: 4.0
 ! NOTA: per il modello BASE impostare s_giorni = n_giorni e k_turni = s_turni
 k_turni: 10
 
-s_giorni: 7
-s_turni: 3
+s_giorni: 30
+s_turni: 30
 
 ! --- MATRICES ---
 
