@@ -1,0 +1,227 @@
+(!
+  test_sigma_delta.mos
+  --------------------
+  Cicla k_turni da K_MAX a K_MIN (per ora 22 -> 16).
+  Il primo k riparte da (SI_START, DI_START), gli altri dall'inizio.
+  Output per ogni k: risultati_k<K>.csv e soluzioni_k<K>.txt (append + flush).
+!)
+
+model "test"
+  uses "mmxprs", "mmsystem"
+
+parameters
+    K_MAX    = 16    ! primo k da risolvere
+    K_MIN    = 15    ! ultimo k da risolvere
+    SI_START = 6     ! indice sigma di ripartenza (solo per il primo k)
+    DI_START = 6.5     ! indice delta di ripartenza (solo per il primo k)
+end-parameters
+
+declarations
+    n_quartieri: integer
+    n_farmacie: integer
+    n_giorni = 30
+end-declarations
+
+initializations from "datafile.dat"
+    n_quartieri n_farmacie
+end-initializations
+
+declarations
+    Q = 1..n_quartieri
+    F = 1..n_farmacie
+    H = 1..n_giorni
+
+    t_dist: array(F, Q) of real
+    pi_dist: array(F, F) of real
+
+    copertura: array(Q, F) of integer
+    costo: array(F, F) of real
+
+    x: array(F, H) of mpvar
+    y: dynamic array(F, F, H) of mpvar
+
+    obiettivo: linctr
+    VincoloCopertura: array(Q, H) of linctr
+    VincoloTurniTotali: array(F) of linctr
+    VincoloLinearizz: dynamic array(F, F, H) of linctr
+end-declarations
+
+initializations from "datafile.dat"
+    t_dist pi_dist
+end-initializations
+
+declarations
+    N_SIGMA = 15
+    N_DELTA = 15
+
+    k_turni: integer
+    si_ini, di_ini: real
+    sigma, delta: real
+    is_infeasible: boolean
+
+    costo_ottimo: real
+    n_coppie: integer
+    n_coperti: integer
+
+    id_csv, id_soluzioni: integer
+    nome_csv, nome_sol: string
+end-declarations
+
+forall(ki in 0..(K_MAX - K_MIN)) do
+
+    k_turni := K_MAX - ki
+
+    ! Solo il primo k riparte da meta'; gli altri dall'inizio
+    if ki = 0 then
+        si_ini := SI_START
+        di_ini := DI_START
+    else
+        si_ini := 1
+        di_ini := 1
+    end-if
+
+    nome_csv := "risultati_k1615"  + ".csv"
+    nome_sol := "soluzioni_k1615"  + ".txt"
+
+    fopen(nome_csv, F_OUTPUT + F_APPEND)
+    id_csv := getfid(F_OUTPUT)
+
+    fopen(nome_sol, F_OUTPUT + F_APPEND)
+    id_soluzioni := getfid(F_OUTPUT)
+
+    if si_ini = 1 and di_ini = 1 then
+        fselect(id_csv)
+        writeln("k_turni,sigma,delta,costo_ottimo,n_coppie_vicine,n_quartieri_coperti")
+        fflush
+    end-if
+
+    forall(si in 1..N_SIGMA) do
+        forall(di in 1..N_DELTA) do
+
+            if si < si_ini or (si = si_ini and di < di_ini) then
+                next
+            end-if
+
+            sigma := si * 0.5
+            delta := di * 0.5
+
+            fopen("", F_OUTPUT)
+            writeln("risolvo k_turni = ", k_turni, ", sigma = ", sigma, ", delta = ", delta)
+
+            forall(q in Q, f in F)
+                copertura(q,f) := if(t_dist(f,q) <= sigma, 1, 0)
+
+            is_infeasible := false
+            forall(q in Q) do
+                if sum(f in F) copertura(q,f) = 0 then
+                    is_infeasible := true
+                    break
+                end-if
+            end-do
+
+            if is_infeasible then
+                fselect(id_soluzioni)
+                writeln("k_turni = ", k_turni, ", sigma = ", sigma, ", delta = ", delta,
+                        ": Infeasible per assenza copertura. Salto.")
+                fflush
+                next
+            end-if
+
+            n_coppie := 0
+            forall(f in F, g in F | f < g) do
+                if pi_dist(f,g) < delta then
+                    costo(f,g) := delta - pi_dist(f,g)
+                    n_coppie += 1
+                else
+                    costo(f,g) := 0
+                end-if
+            end-do
+
+            reset(y)
+            reset(VincoloLinearizz)
+
+            forall(f in F, h in H) x(f,h) is_binary
+
+            forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
+                create(y(f,g,h))
+                y(f,g,h) is_binary
+            end-do
+
+            forall(q in Q, h in H) do
+                VincoloCopertura(q,h) := sum(f in F | copertura(q,f) = 1) x(f,h) >= 1
+            end-do
+
+            forall(f in F) do
+                VincoloTurniTotali(f) := sum(h in H) x(f,h) <= k_turni
+            end-do
+
+            forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
+                VincoloLinearizz(f,g,h) := y(f,g,h) >= x(f,h) + x(g,h) - 1
+            end-do
+
+            obiettivo := sum(f, g in F, h in H | f < g and costo(f,g) > 0) (costo(f,g) * y(f,g,h))
+            minimize(obiettivo)
+
+            if getprobstat <> XPRS_OPT then
+                fselect(id_soluzioni)
+                writeln("k_turni = ", k_turni, ", sigma = ", sigma, ", delta = ", delta,
+                        ": Non ottimo/ammissibile dal solutore (status ", getprobstat, "). Salto.")
+                fflush
+                next
+            end-if
+
+            costo_ottimo := getobjval
+
+            fopen("", F_OUTPUT)
+            writeln("--- OK k_turni = ", k_turni, ", sigma = ", sigma, ", delta = ", delta,
+                    " -> costo ", costo_ottimo)
+
+            fselect(id_soluzioni)
+            writeln("\n--- RISULTATI OTTIMIZZAZIONE k_turni = ", k_turni, ", sigma = ", sigma,
+                    ", delta = ", delta, " ---")
+            writeln("Status soluzione: ", getprobstat)
+            writeln("Costo totale: ", costo_ottimo)
+
+            forall(h in H) do
+                write("Giorno ", h, "\t-> Farmacie aperte: ")
+                forall(f in F) do
+                    if getsol(x(f,h)) = 1 then
+                        write("F", f, " ")
+                    end-if
+                end-do
+                writeln("")
+            end-do
+            fflush
+
+            n_coperti := 0
+            forall(q in Q) do
+                if (sum(f in F) copertura(q,f) * getsol(x(f,1))) >= 1 then
+                    n_coperti += 1
+                end-if
+            end-do
+
+            fselect(id_csv)
+            writeln(k_turni, ",", sigma, ",", delta, ",", costo_ottimo, ",", n_coppie, ",", n_coperti)
+            fflush
+
+        end-do
+    end-do
+
+    fclose(id_csv)
+    fclose(id_soluzioni)
+
+    ! Libera vincoli e variabili prima del prossimo k
+    reset(y)
+    reset(VincoloLinearizz)
+    reset(VincoloCopertura)
+    reset(VincoloTurniTotali)
+
+    fopen("", F_OUTPUT)
+    writeln("Completato k_turni = ", k_turni)
+
+end-do
+
+fopen("", F_OUTPUT)
+writeln("Esecuzione completata.")
+
+end-model
