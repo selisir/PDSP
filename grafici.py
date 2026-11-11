@@ -86,7 +86,8 @@ def g1_esiti(df):
     salva(fig, "1_esiti_pdsp")
 
 def g2_costi(df):
-    df3 = df[df['sigma'] == 3.0].dropna(subset=['costo'])
+    # Solo combinazioni risolte (ottime o in timeout): le infeasible non hanno costo
+    df3 = df[(df['sigma'] == 3.0) & (df['status'] != 'Infeasible')].dropna(subset=['costo'])
     delta_vals = [2.5, 3.0, 3.5]
     medie = [df3[df3['delta']==d]['costo'].mean() for d in delta_vals]
     massimi = [df3[df3['delta']==d]['costo'].max() for d in delta_vals]
