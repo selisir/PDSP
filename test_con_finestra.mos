@@ -166,6 +166,8 @@ forall(k in 1..N_K_TURNI) do
                     reset(y)
                     reset(VincoloSliding)
                     reset(VincoloLinearizz)
+                    reset(VincoloCopertura)
+                    reset(VincoloTurniTotali)
 
                     forall(f in F, h in H) x(f,h) is_binary
 
