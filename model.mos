@@ -1,9 +1,15 @@
 model "PDSP_Modello"
-uses "mmxprs"
+uses "mmxprs", "mmsystem"
 
 ! =========================================================================
 ! BLOCCO 1: dimensioni e parametri
 ! =========================================================================
+declarations
+    start_time: real
+    tempo_esecuzione: real
+    nodi_esplorati: integer
+end-declarations
+
 declarations
     n_quartieri: integer
     n_farmacie: integer
@@ -72,7 +78,7 @@ forall(f, g in F | f < g) do
 end-do
 
 ! --- STAMPA FARMACIE VICINE --- 
-
+(!
 writeln("\n--- COPPIE CON PENALITA' DI VICINANZA (costo > 0) ---")
 n_coppie := 0
 
@@ -84,6 +90,7 @@ end-do
 if n_coppie = 0 then
     writeln("Nessuna coppia di farmacie si trova a distanza inferiore a delta (", delta, " km).")
 end-if
+!)
 
 ! --- VARIABILI E DOMINI ---
 
@@ -121,11 +128,29 @@ forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
     y(f,g,h) >= x(f,h) + x(g,h) - 1
 end-do
 
+! --- SIMMETRIA ---
+(!
+forall(h in 1..n_giorni-1) do
+    sum(f in F) f * x(f, h) <= sum(f in F) f * x(f, h + 1)
+end-do
+!)
+
 ! --- FUNZIONE OBIETTIVO ---
 
 F_Obiettivo := sum(f, g in F, h in H | f < g and costo(f,g) > 0) (costo(f,g) * y(f,g,h))
 
+start_time := gettime
+
 minimize(F_Obiettivo)
+
+end_time := gettime
+tempo_esecuzione := end_time - start_time
+nodi_esplorati := getparam("XPRS_NODES")
+
+writeln("\n--- PERFORMANCE SOLUTORE ---")
+writeln("Tempo di risoluzione : ", tempo_esecuzione, " secondi")
+writeln("Nodi esplorati       : ", nodi_esplorati)
+writeln("Iterazioni simplesso : ", getparam("XPRS_SIMPLEXITER"))
 
 ! --- STAMPA COPERTURA QUARTIERI ---
 
