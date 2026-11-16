@@ -1,6 +1,6 @@
 # PDSP – Pharmacy Duty Scheduling Problem
 
-📎 [Presentazione](https://canva.link/dy5vi8qopmeiahs)
+📎 [Presentazione]
 
 Progetto fatto with [@Mottyna](https://github.com/Mottyna)
 
