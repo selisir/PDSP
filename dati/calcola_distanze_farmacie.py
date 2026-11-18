@@ -14,7 +14,7 @@ df = pd.read_csv("farmacie.csv")  # colonne: id, nome, lat, lon
 n = len(df)
 ids = df["id"].tolist()
 
-# Matrice triangolare superiore: valori solo per i < j, resto a 0
+# matrice triangolare superiore: valori solo per i < j, resto a 0
 matrice = np.zeros((n, n))
 for i in range(n):
     for j in range(n):
@@ -26,7 +26,7 @@ for i in range(n):
         # i == j -> resta 0 (diagonale)
         # i > j  -> resta 0 (parte inferiore)
 
-# --- Export .dat in formato matrice (righe/colonne) per Mosel ---
+# .dat in formato matrice (righe/colonne) per mosel
 with open("farmacie_triangolare.dat", "w") as f:
     f.write("PHARMACIES: [" + ", ".join(str(i) for i in ids) + "]\n\n")
     f.write("DIST: [\n")

@@ -107,8 +107,7 @@ writeln("k_turni,s_giorni,s_turni,sigma,delta,costo_ottimo,n_coppie_vicine,n_qua
 
 
 fopen("", F_OUTPUT)
-writeln("ciao")
-writeln("")
+
 ! -----------------------------------------------------------------------
 ! LOOP PARAMETRICO COMPLETO
 ! -----------------------------------------------------------------------

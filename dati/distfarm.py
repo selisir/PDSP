@@ -13,7 +13,7 @@ def haversine(lat1, lon1, lat2, lon2):
 df = pd.read_csv("farmacie.csv")  # colonne: id, nome, lat, lon
 n = len(df)
 
-# Matrice distanze
+# matrice distanze
 matrice = np.zeros((n, n))
 for i in range(n):
     for j in range(n):
@@ -23,7 +23,7 @@ for i in range(n):
                 df.loc[j, "lat"], df.loc[j, "lon"]
             )
 
-# Costruzione DataFrame con layout: id, nome, dist1, dist2, ...
+# costruzione dataframe con layout: id, nome, dist1, dist2, ...
 colonne_dist = [f"dist{i+1}" for i in range(n)]
 df_out = pd.DataFrame(matrice, columns=colonne_dist)
 df_out.insert(0, "id", df["id"].values)

@@ -4,15 +4,14 @@ Generatore Grafici Analisi Finestra - Stile PDSP.
 Uso:   pip install pandas matplotlib
        python grafici.py
 Output: cartella ./grafici_pdsp_finestra con i 3 grafici in PNG e PDF,
-        senza sfondo (trasparenti), senza titoli né etichette degli assi:
-        solo legenda e numeri sul grafico.
+        senza sfondo (trasparenti), senza titoli né etichette degli assi
 """
 import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 import sys
 
-OUT = Path("grafici_pdsp_finestra")
+OUT = Path("../grafici_pdsp_finestra")
 OUT.mkdir(exist_ok=True)
 
 BLU, GRIGIO, TESTO = "#2575d4", "#b9b6ad", "#333333"
@@ -42,7 +41,7 @@ def salva(fig, nome):
     print("Creato:", nome)
 
 def carica_dati(csv_path):
-    """Legge e normalizza il dataset dal file CSV reale."""
+    """Legge e normalizza il dataset dal file CSV."""
     path = Path(csv_path)
     if not path.exists():
         print(f"ERRORE: Impossibile trovare il file '{csv_path}'.")
@@ -138,7 +137,7 @@ def g3_successo(df):
     salva(fig, "3_successo_pdsp")
 
 if __name__ == "__main__":
-    csv_file = sys.argv[1] if len(sys.argv) > 1 else "risultati_test_finestra_2_integrati.csv"
+    csv_file = sys.argv[1] if len(sys.argv) > 1 else "./test/risultati_test_finestra_2_integrati.csv"
     print(f"Lettura dati da {csv_file} in corso...")
     df = carica_dati(csv_file)
     print("Creazione grafici...")
