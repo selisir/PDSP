@@ -1,0 +1,39 @@
+k_turni = 19, sigma = 0.5, delta = 0.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 0.5, delta = 1: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 0.5, delta = 1.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 0.5, delta = 2: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 0.5, delta = 2.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 0.5, delta = 3: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 0.5, delta = 3.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 0.5, delta = 4: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 0.5, delta = 4.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 0.5, delta = 5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 0.5, delta = 5.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 0.5, delta = 6: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 0.5, delta = 6.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 0.5, delta = 7: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 0.5, delta = 7.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 0.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 1: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 1.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 2: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 2.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 3: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 3.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 4: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 4.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 5.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 6: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 6.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 7: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1, delta = 7.5: Infeasible per assenza copertura. Salto.
+k_turni = 19, sigma = 1.5, delta = 0.5: Non ottimo/ammissibile dal solutore (status 6). Salto.
+k_turni = 19, sigma = 1.5, delta = 1: Non ottimo/ammissibile dal solutore (status 6). Salto.
+k_turni = 19, sigma = 1.5, delta = 1.5: Non ottimo/ammissibile dal solutore (status 6). Salto.
+k_turni = 19, sigma = 1.5, delta = 2: Non ottimo/ammissibile dal solutore (status 6). Salto.
+k_turni = 19, sigma = 1.5, delta = 2.5: Non ottimo/ammissibile dal solutore (status 6). Salto.
+k_turni = 19, sigma = 1.5, delta = 3: Non ottimo/ammissibile dal solutore (status 6). Salto.
+k_turni = 19, sigma = 1.5, delta = 3.5: Non ottimo/ammissibile dal solutore (status 6). Salto.
+k_turni = 19, sigma = 1.5, delta = 4: Non ottimo/ammissibile dal solutore (status 6). Salto.
+k_turni = 19, sigma = 1.5, delta = 4.5: Non ottimo/ammissibile dal solutore (status 6). Salto.
