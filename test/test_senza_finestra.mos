@@ -1,16 +1,7 @@
-(!
-  test_sigma_delta.mos
-  --------------------
-  Test parametrico senza sliding window: risolve il PDSP per ogni combinazione
-  (k_turni, sigma, delta) e salva costo ottimo + statistiche su CSV.
-!)
 
 model "test"
   uses "mmxprs", "mmsystem"
 
-! =========================================================================
-! BLOCCO 1: dimensioni e parametri
-! =========================================================================
 declarations
     n_quartieri: integer
     n_farmacie: integer
@@ -22,9 +13,6 @@ initializations from "datafile.dat"
     n_quartieri n_farmacie
 end-initializations
 
-! =========================================================================
-! BLOCCO 2: insiemi e strutture dati
-! =========================================================================
 declarations
     Q = 1..n_quartieri
     F = 1..n_farmacie
@@ -41,7 +29,6 @@ declarations
     
     obiettivo: linctr                  ! funzione obiettivo
 
-    ! DICHIARAZIONE ESPLICITA DEI VINCOLI (evita l'accumulo anonimo)
     VincoloCopertura: array(Q, H) of linctr
     VincoloTurniTotali: array(F) of linctr
     VincoloLinearizz: dynamic array(F, F, H) of linctr
@@ -60,7 +47,6 @@ declarations
     DELTA_VALS : array(1..N_DELTA) of real
     K_TURNI_VALS : array(1..N_K_TURNI) of integer
     
-    ! DICHIARAZIONE VARIABILI DI CICLO
     sigma, delta: real
     k_turni: integer
     is_infeasible: boolean
@@ -72,7 +58,6 @@ declarations
     id_csv, id_soluzioni: integer
 end-declarations
 
-! Generazione dinamica dei valori
 forall(i in 1..N_SIGMA) do
   SIGMA_VALS(i) := i * 0.1
   DELTA_VALS(i) := i * 0.1
@@ -82,20 +67,16 @@ forall(i in 1..N_K_TURNI) do
   K_TURNI_VALS(i) := 31 - i
 end-do
 
-! Apertura file
+
 fopen("risultati_test.csv", F_OUTPUT)
 id_csv := getfid(F_OUTPUT)
 
 fopen("soluzioni_test.txt", F_OUTPUT)
 id_soluzioni := getfid(F_OUTPUT)
 
-! Scrittura intestazione CSV
 fselect(id_csv)
 writeln("k_turni,sigma,delta,costo_ottimo,n_coppie_vicine,n_quartieri_coperti")
 
-! -----------------------------------------------------------------------
-! TRIPLE LOOP: k_turni, sigma, delta
-! -----------------------------------------------------------------------
 forall(k in 1..N_K_TURNI) do
     forall(si in 1..N_SIGMA) do
         forall(di in 1..N_DELTA) do
@@ -109,11 +90,10 @@ forall(k in 1..N_K_TURNI) do
             writeln("risolvo")
             writeln("")
 
-            ! 2. Ricalcola copertura
             forall(q in Q, f in F)
                 copertura(q,f) := if(t_dist(f,q) <= sigma, 1, 0)
             
-            ! CONTROL PREVENTIVO COPERTURA
+            ! CONTROLLO PREVENTIVO COPERTURA
             is_infeasible := false
             forall(q in Q) do
                 if sum(f in F) copertura(q,f) = 0 then
@@ -128,7 +108,6 @@ forall(k in 1..N_K_TURNI) do
                 next
             end-if
 
-            ! 3. Calcolo costi e reset variabili/vincoli dinamici
             n_coppie := 0
             forall(f in F, g in F | f < g) do
                 if pi_dist(f,g) < delta then
@@ -144,13 +123,11 @@ forall(k in 1..N_K_TURNI) do
 
             forall(f in F, h in H) x(f,h) is_binary
 
-            ! Creazione delle y per le coppie valide
             forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
                 create(y(f,g,h))
                 y(f,g,h) is_binary
             end-do
             
-            ! 4. Definizione e Sovrascrittura dei Vincoli
             forall(q in Q, h in H) do
                 VincoloCopertura(q,h) := sum(f in F | copertura(q,f) = 1) x(f,h) >= 1
             end-do
@@ -163,7 +140,6 @@ forall(k in 1..N_K_TURNI) do
                 VincoloLinearizz(f,g,h) := y(f,g,h) >= x(f,h) + x(g,h) - 1
             end-do
 
-            ! 5. Risoluzione
             obiettivo := sum(f, g in F, h in H | f < g and costo(f,g) > 0) (costo(f,g) * y(f,g,h))
             minimize(obiettivo)
             
@@ -181,7 +157,6 @@ forall(k in 1..N_K_TURNI) do
             writeln("Costo totale: ", getobjval)
             writeln("")
             
-            ! 6. Scrittura dettagli in soluzioni_test.txt
             fselect(id_soluzioni)
             writeln("\n--- RISULTATI OTTIMIZZAZIONE k_turni = ", k_turni, ", sigma = ", sigma, ", delta = ", delta, " ---")
             writeln("Status soluzione: ", getprobstat)
@@ -197,7 +172,6 @@ forall(k in 1..N_K_TURNI) do
                 writeln("")
             end-do
 
-            ! 7. Conteggio quartieri coperti al giorno 1
             n_coperti := 0
             forall(q in Q) do
                 if (sum(f in F) copertura(q,f) * getsol(x(f,1))) >= 1 then
@@ -205,7 +179,6 @@ forall(k in 1..N_K_TURNI) do
                 end-if
             end-do
 
-            ! 8. Scrittura riga nel CSV
             fselect(id_csv)
             writeln(k_turni, ",", sigma, ",", delta, ",", costo_ottimo, ",", n_coppie, ",", n_coperti)
 
@@ -213,7 +186,6 @@ forall(k in 1..N_K_TURNI) do
     end-do    ! fine loop sigma
 end-do     ! fine loop k_turni
 
-! Chiudi i file
 fclose(id_csv)
 fclose(id_soluzioni)
 writeln("Esecuzione completata. Risultati salvati correttamente.")
