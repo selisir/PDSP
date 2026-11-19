@@ -1,16 +1,13 @@
 (!
   test_sigma_delta.mos
   --------------------
-  Test parametrico: risolve il PDSP per ogni combinazione
+  Test parametrico: risolve per ogni combinazione
   (k_turni, s_giorni, s_turni, sigma, delta) e salva costo ottimo + statistiche su CSV.
 !)
 
 model "test"
   uses "mmxprs", "mmsystem"
 
-! =========================================================================
-! BLOCCO 1: dimensioni e parametri
-! =========================================================================
 declarations
     n_quartieri: integer
     n_farmacie: integer
@@ -22,9 +19,6 @@ initializations from "datafile.dat"
     n_quartieri n_farmacie
 end-initializations
 
-! =========================================================================
-! BLOCCO 2: insiemi e strutture dati
-! =========================================================================
 declarations
     Q = 1..n_quartieri
     F = 1..n_farmacie
@@ -41,7 +35,6 @@ declarations
     
     obiettivo: linctr                  ! funzione obiettivo
 
-    ! DICHIARAZIONE ESPLICITA DEI VINCOLI (per resettarli ad ogni iterazione)
     VincoloCopertura: array(Q, H) of linctr
     VincoloTurniTotali: array(F) of linctr
     VincoloSliding: dynamic array(F, integer) of linctr
@@ -52,9 +45,6 @@ initializations from "datafile.dat"
     t_dist pi_dist
 end-initializations
 
-(!--- RISULTATI OTTIMIZZAZIONE k_turni=5 s_giorni=3 s_turni=1 sigma=3 delta=3 ---
-Status soluzione: 2
-Costo totale: 0.595!)
 
 declarations
     N_SIGMA = 3
@@ -68,7 +58,6 @@ declarations
     K_TURNI_VALS : array(1..N_K_TURNI) of integer
     N_S_GIORNI_VALS : array(1..N_S_GIORNI) of integer     
     
-    ! DICHIARAZIONE DELLE VARIABILI DI CICLO
     sigma, delta: real
     k_turni, s_giorni, s_turni: integer
     is_infeasible: boolean
@@ -81,7 +70,6 @@ end-declarations
 K_TURNI_VALS :: [5, 7, 10, 15, 20]
 N_S_GIORNI_VALS :: [3, 5, 7, 10, 15, 20]
 
-! Generazione dinamica dei valori
 cont := 2.5
 forall(i in 1..N_DELTA) do
   	SIGMA_VALS(i) := cont
@@ -94,7 +82,6 @@ declarations
     id_csv, id_soluzioni: integer
 end-declarations
 
-! Apri entrambi i file e cattura i loro ID
 fopen("risultati_test_finestra.csv", F_OUTPUT)
 id_csv := getfid(F_OUTPUT)
 
@@ -102,15 +89,11 @@ fopen("soluzioni_test_finestra.txt", F_OUTPUT)
 id_soluzioni := getfid(F_OUTPUT)
 
 fselect(id_csv)
-! Intestazione CSV aggiornata con s_giorni e s_turni
 writeln("k_turni,s_giorni,s_turni,sigma,delta,costo_ottimo,n_coppie_vicine,n_quartieri_coperti")
 
 
 fopen("", F_OUTPUT)
 
-! -----------------------------------------------------------------------
-! LOOP PARAMETRICO COMPLETO
-! -----------------------------------------------------------------------
 forall(k in 1..N_K_TURNI) do
     forall(sg in 1..N_S_GIORNI) do
         s_giorni := N_S_GIORNI_VALS(sg)
@@ -125,16 +108,14 @@ forall(k in 1..N_K_TURNI) do
                 	writeln("inizio a risolvere")
                     writeln("")
 
-                    ! 1. Aggiorna parametri globali
                     sigma := SIGMA_VALS(si)
                     delta := DELTA_VALS(di)
                     k_turni := K_TURNI_VALS(k)
 
-                    ! 2. Ricalcola copertura e costi
                     forall(q in Q, f in F)
                         copertura(q,f) := if(t_dist(f,q) <= sigma, 1, 0)
                     
-                    ! CONTROLLO PREVENTIVO INFEASIBILITY SULLA COPERTURA
+                    ! CONTROLLO PREVENTIVO INFEASIBILITY
                     is_infeasible := false
                     forall(q in Q) do
                         if sum(f in F) copertura(q,f) = 0 then
@@ -161,7 +142,7 @@ forall(k in 1..N_K_TURNI) do
                         end-if
                     end-do
 
-                    ! Reset delle variabili dinamiche e vincoli ad ogni ciclo
+                    ! reset delle variabili dinamiche e vincoli
                     reset(y)
                     reset(VincoloSliding)
                     reset(VincoloLinearizz)
@@ -170,13 +151,10 @@ forall(k in 1..N_K_TURNI) do
 
                     forall(f in F, h in H) x(f,h) is_binary
 
-                    ! Creazione delle y per le coppie con costo > 0
                     forall(f, g in F, h in H | f < g and costo(f,g) > 0) do
                         create(y(f,g,h))
                         y(f,g,h) is_binary
                     end-do
-                    
-                    ! 3. Assegnazione e sovrascrittura sicura dei vincoli
                     
                     ! Copertura
                     forall(q in Q, h in H) do
@@ -200,7 +178,6 @@ forall(k in 1..N_K_TURNI) do
                         VincoloLinearizz(f,g,h) := y(f,g,h) >= x(f,h) + x(g,h) - 1
                     end-do
 
-                    ! 4. Risoluzione
                     obiettivo := sum(f, g in F, h in H | f < g and costo(f,g) > 0) (costo(f,g) * y(f,g,h))
                     setparam("XPRS_MAXTIME", 300)
                     minimize(obiettivo)
@@ -229,7 +206,6 @@ forall(k in 1..N_K_TURNI) do
                     writeln("Costo totale: ", getobjval)
                     writeln("")
                     
-                    ! Stampa soluzioni sul file .txt
                     fselect(id_soluzioni)
                     writeln("\n--- RISULTATI OTTIMIZZAZIONE k_turni=", k_turni, " s_giorni=", s_giorni, " s_turni=", s_turni, " sigma=", sigma, " delta=", delta, " ---")
                     writeln("Status soluzione: ", getprobstat)
@@ -245,7 +221,6 @@ forall(k in 1..N_K_TURNI) do
                         writeln("")
                     end-do
 
-                    ! 5. Conta quartieri coperti al giorno 1
                     n_coperti := 0
                     forall(q in Q) do
                         if getsol(sum(f in F) copertura(q,f) * x(f,1)) >= 1 then
@@ -253,7 +228,6 @@ forall(k in 1..N_K_TURNI) do
                         end-if
                     end-do
 
-                    ! 6. Scrivi riga completa nel CSV
                     fselect(id_csv)
                     writeln(k_turni, ",", s_giorni, ",", s_turni, ",", sigma, ",", delta, ",", costo_ottimo, ",", n_coppie, ",", n_coperti)
 
@@ -263,7 +237,6 @@ forall(k in 1..N_K_TURNI) do
     end-do            ! fine loop s_giorni 
 end-do               ! fine loop k_turni
 
-! Chiudi i file
 fclose(id_csv)
 fclose(id_soluzioni)
 writeln("Fine. Risultati salvati in: risultati_test_finestra.csv e soluzioni_test_finestra.txt")
