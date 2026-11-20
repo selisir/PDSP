@@ -1,186 +1,355 @@
 """
-Grafici del report PDSP (test parametrico e test «finestra»).
-Tutti i dati vengono dai documenti analizzati.
+Grafici PDSP *senza finestra*: PNG (200 dpi) e PDF con sfondo trasparente.
 
-Uso:   pip install matplotlib
-       python grafici_pdsp.py
-Output: cartella ./grafici_pdsp con 6 PNG (200 dpi) e 6 PDF (vettoriali).
+  1  k minimo per sigma
+  2  costo contro delta (sigma = 1,5, k = 30)
+  3  mappa della soglia di delta per (sigma, k)
+  4  cadenza di apertura delle farmacie
+  5  coppie di farmacie vicine contro delta
+
+TUTTI i valori sono calcolati dai file dello zip risultati_senza_finestra
+(cartella o .zip):
+  - risultati*.csv   costi e n_coppie_vicine (grafici 16 e 19);
+  - soluzioni*.txt   esito di ogni combinazione (k, sigma, delta), costo e
+                     farmacie aperte giorno per giorno (grafici 15, 17, 18).
+
+Uso:   pip install matplotlib pandas numpy
+       python grafici_pdsp.py [percorso_dati]
+Output: cartella ./grafici_pdsp
 """
+import sys
+import zipfile
 from pathlib import Path
+
 import matplotlib.pyplot as plt
+from matplotlib.colors import LinearSegmentedColormap
+import pandas as pd
+
+
+# ------------------------------------------------------------- file CSV ---
+def _normalizza(raw, nome):
+    """Porta un CSV (con o senza intestazione) a colonne uniformi."""
+    raw = raw[raw[0] != "k_turni"].dropna(how="all")
+    if raw.empty:
+        return None
+    if raw[3].isin(["OTTIMO", "TEMPO_LIMITE"]).all():          # k,sigma,delta,stato,costo,tempo
+        d = raw.rename(columns={0: "k", 1: "sigma", 2: "delta",
+                                3: "stato", 4: "costo"})
+        d["coppie"] = float("nan")
+    else:                                                      # k,sigma,delta,costo,coppie,quartieri
+        d = raw.rename(columns={0: "k", 1: "sigma", 2: "delta",
+                                3: "costo", 4: "coppie"})
+        d["stato"] = "OTTIMO"
+    d = d[["k", "sigma", "delta", "stato", "costo", "coppie"]].copy()
+    for c in ("k", "sigma", "delta", "costo", "coppie"):
+        d[c] = pd.to_numeric(d[c])
+    d["k"] = d["k"].astype(int)
+    d["fonte"] = nome
+    return d
+
+
+def carica(percorso):
+    """Legge tutti i risultati*.csv. Per ogni (k, sigma, delta) tiene il costo
+    minore. Ritorna (combinazioni, n_coppie_vicine per delta, n. righe)."""
+    frames = []
+    p = Path(percorso)
+    if p.suffix == ".zip":
+        with zipfile.ZipFile(p) as z:
+            for n in sorted(z.namelist()):
+                if n.endswith(".csv") and "finestra" not in Path(n).name:
+                    with z.open(n) as f:
+                        frames.append(_normalizza(
+                            pd.read_csv(f, header=None, dtype=str), Path(n).name))
+    else:
+        for f in sorted(p.glob("*.csv")):
+            if "finestra" in f.name:
+                continue
+            frames.append(_normalizza(
+                pd.read_csv(f, header=None, dtype=str), f.name))
+    tutti = pd.concat([f for f in frames if f is not None], ignore_index=True)
+    coppie = tutti.dropna(subset=["coppie"]).groupby("delta")["coppie"].max()
+    tutti["tl"] = tutti["stato"] == "TEMPO_LIMITE"
+    migliori = (tutti.sort_values(["k", "sigma", "delta", "costo", "tl"])
+                .drop_duplicates(["k", "sigma", "delta"]))
+    return migliori, coppie, len(tutti)
+
+
+def trova_dati():
+    if len(sys.argv) > 1:
+        return Path(sys.argv[1])
+    base = Path(__file__).resolve().parent
+    for cand in (base / "risultati_senza_finestra",
+                 base / "risultati_senza_finestra.zip",
+                 Path("risultati_senza_finestra"),
+                 Path("risultati_senza_finestra.zip")):
+        if cand.exists():
+            return cand
+    sys.exit("Non trovo la cartella o lo zip 'risultati_senza_finestra'. "
+             "Passala come argomento: python grafici_pdsp.py <percorso>")
+
+
+# --------------------------------------------------- file delle soluzioni ---
+import re
+from collections import Counter
+
+_HDR = re.compile(r"--- RISULTATI OTTIMIZZAZIONE\s+k_turni = (\d+), "
+                  r"sigma = ([\d.]+), delta = ([\d.]+) ---")
+_NO = re.compile(r"k_turni = (\d+), sigma = ([\d.]+), delta = ([\d.]+): (.*)")
+
+
+def _righe_txt(percorso):
+    p = Path(percorso)
+    if p.suffix == ".zip":
+        with zipfile.ZipFile(p) as z:
+            for n in sorted(z.namelist()):
+                if n.endswith(".txt") and Path(n).name.startswith("soluzioni"):
+                    yield from z.read(n).decode("utf-8", "replace").splitlines()
+    else:
+        for f in sorted(p.glob("soluzioni*.txt")):
+            yield from f.read_text(encoding="utf-8", errors="replace").splitlines()
+
+
+def carica_soluzioni(percorso):
+    """Ritorna {(k, sigma, delta): record} con la prima occorrenza di ogni
+    combinazione. record: risolto (bool), costo, aperture (Counter)."""
+    sol, cur = {}, None
+    for riga in _righe_txt(percorso):
+        m = _HDR.search(riga)
+        if m:
+            key = (int(m[1]), float(m[2]), float(m[3]))
+            cur = None
+            if key not in sol:
+                cur = {"risolto": True, "costo": None, "aperture": Counter()}
+                sol[key] = cur
+            continue
+        m = _NO.match(riga)
+        if m:                                   # combinazione non risolta
+            key = (int(m[1]), float(m[2]), float(m[3]))
+            sol.setdefault(key, {"risolto": False, "costo": None,
+                                 "aperture": Counter()})
+            cur = None
+            continue
+        if cur is None:
+            continue
+        if riga.startswith("Costo totale"):
+            cur["costo"] = float(riga.split(":")[1])
+        elif riga.startswith("Giorno"):
+            cur["aperture"].update(riga.split("aperte:")[1].split())
+    return sol
 
 OUT = Path("grafici_pdsp")
 OUT.mkdir(exist_ok=True)
 
-BLU, GRIGIO, TESTO = "#2575d4", "#b9b6ad", "#333333"
+VERDE, VERDE_CH = "#277a5e", "#a8bab4"
 plt.rcParams.update({
-    "font.size": 11,
+    "font.size": 9,
+    "axes.edgecolor": "#888888",
     "axes.spines.top": False,
     "axes.spines.right": False,
-    "axes.edgecolor": "#888888",
     "figure.dpi": 100,
 })
 
 
 def it(v, nd=None):
-    """Formato numerico italiano (virgola decimale)."""
     s = f"{v:.{nd}f}" if nd is not None else f"{v:g}"
     return s.replace(".", ",")
 
 
 def salva(fig, nome):
     fig.tight_layout()
-    fig.savefig(OUT / f"{nome}.png", dpi=200)
-    fig.savefig(OUT / f"{nome}.pdf")
+    fig.savefig(OUT / f"{nome}.png", dpi=200, transparent=True)
+    fig.savefig(OUT / f"{nome}.pdf", transparent=True)
     plt.close(fig)
     print("creato:", nome)
 
 
-# 1) Esiti sulle 6.522 combinazioni (k, sigma, delta) ----------------------
-def g1_esiti():
-    etichette = ["Ottimo", "Limite di tempo",
-                 "Non ammissibile: k troppo basso",
-                 "Non ammissibile: σ ≤ 1 (copertura)"]
-    valori = [4771, 11, 930, 810]
-    colori = [BLU, GRIGIO, GRIGIO, GRIGIO]
-    tot = sum(valori)
-    fig, ax = plt.subplots(figsize=(9, 3.8))
-    ax.barh(etichette[::-1], valori[::-1], color=colori[::-1])
-    for i, v in enumerate(valori[::-1]):
-        ax.text(v + 60, i, f"{v:,} ({it(v / tot * 100, 1)}%)".replace(",", "."),
-                va="center", color=TESTO)
-    ax.set_xlim(0, 6200)
-    ax.set_xlabel("Combinazioni (k, σ, δ)")
-    ax.set_title("Il 73,3% delle 6.522 combinazioni ha una soluzione",
-                 loc="left", fontweight="bold")
-    salva(fig, "1_esiti_combinazioni")
+# grafico 1 ----------------------------------------------------------------
+def g1_k_minimo(sol):
+    sigma = sorted({k[1] for k in sol})
+    kmin = {}
+    for (k, sg, d), r in sol.items():
+        if r["risolto"]:
+            kmin[sg] = min(kmin.get(sg, 10**9), k)
+    k_floor = min(kmin.values())
+    primo_floor = min(s for s, k in kmin.items() if k == k_floor)
+    senza = [s for s in sigma if s not in kmin]
+    fig, ax = plt.subplots(figsize=(9.5, 3.9))
+    for i, s in enumerate(sigma):
+        if s in kmin:
+            ax.bar(i, kmin[s], width=0.62, color=VERDE if s <= primo_floor else VERDE_CH)
+            ax.text(i, kmin[s] + 0.5, kmin[s], ha="center", va="bottom", fontsize=8)
+    if senza:
+        ax.text(-0.35, max(kmin.values()) * 0.28, f"σ ≤ {it(max(senza))} km:\nnessuna soluzione",
+                fontsize=8, va="center", bbox=dict(fc="white", ec="none", pad=1.5))
+    ax.set_xticks(range(len(sigma)))
+    ax.set_xticklabels([it(s) for s in sigma], fontsize=8)
+    ax.set_yticks([])
+    ax.set_ylim(0, max(kmin.values()) * 1.13)
+    ax.spines["left"].set_visible(False)
+    salva(fig, "1_k_minimo_per_sigma")
 
 
-# 2) k minimo ammissibile per sigma ---------------------------------------
-def g2_k_minimo():
-    sigma = ["1,5", "2,0", "2,5", "3,0", "≥ 3,5"]
-    kmin = [30, 15, 10, 5, 2]
-    fig, ax = plt.subplots(figsize=(8, 4.5))
-    barre = ax.bar(sigma, kmin, color=BLU, width=0.55)
-    for b, v in zip(barre, kmin):
-        ax.text(b.get_x() + b.get_width() / 2, v + 0.5, v, ha="center")
-    ax.set_xlabel("σ (km)")
-    ax.set_ylabel("k minimo ammissibile")
-    ax.set_title("Più σ è grande, meno turni k servono: da 30 a 2\n"
-                 "(identico per tutti i δ; σ ≤ 1: nessuna soluzione)",
-                 loc="left", fontweight="bold", fontsize=12)
-    salva(fig, "2_k_minimo_per_sigma")
+# grafico 2 ----------------------------------------------------------------
+def g2_costo_delta(D, sigma=1.5, k=30):
+    d = D[(D.sigma == sigma) & (D.k == k)].sort_values("delta")
+    delta, costo = list(d.delta), list(d.costo)
+    fig, ax = plt.subplots(figsize=(8, 3.9))
+    ax.yaxis.grid(True, color="#dddddd", lw=0.7)
+    ax.set_axisbelow(True)
+    ax.plot(delta, costo, "-o", color="#1c7a5a", lw=1.6, ms=3,
+            label=f"σ = {it(sigma, 1)}")
+    ax.text(delta[-1] + 0.12, costo[-1], f"{costo[-1]:.0f}", va="center",
+            fontsize=7, color="#555555")
+    tick = [x for x in delta if (x * 2) % 2 == 1]
+    ax.set_xticks(tick)
+    ax.set_xticklabels([it(x, 1) for x in tick], fontsize=7)
+    top = int(-(-max(costo) // 50) * 50)
+    ax.set_yticks(range(0, top + 1, 50))
+    ax.tick_params(axis="y", labelsize=7)
+    ax.set_xlim(delta[0] - 0.1, delta[-1] + 0.9)
+    ax.set_ylim(0, top + 10)
+    ax.spines["left"].set_visible(False)
+    ax.legend(loc="upper left", frameon=False, fontsize=7)
+    salva(fig, "2_costo_vs_delta")
 
 
-# 3) Costo medio e massimo per sigma --------------------------------------
-def g3_costo_sigma():
-    sigma = ["1,5", "2,0", "2,5", "3,0", "3,5", "4,0–7,5"]
-    medio = [132.2, 33.4, 27.3, 4.2, 0.24, 0]
-    massimo = [397.0, 118.9, 121.7, 84.6, 23.4, 0]
-    x = range(len(sigma))
-    w = 0.38
-    fig, ax = plt.subplots(figsize=(9, 4.8))
-    b1 = ax.bar([i - w / 2 for i in x], massimo, w, color=GRIGIO, label="Massimo")
-    b2 = ax.bar([i + w / 2 for i in x], medio, w, color=BLU, label="Medio")
-    for barre in (b1, b2):
-        for b in barre:
-            ax.text(b.get_x() + b.get_width() / 2, b.get_height() + 4,
-                    it(b.get_height()), ha="center", fontsize=9)
-    ax.set_xticks(list(x))
-    ax.set_xticklabels(sigma)
-    ax.set_xlabel("σ (km)")
-    ax.set_ylabel("Costo")
-    ax.legend(frameon=False)
-    ax.set_title("Il costo massimo crolla con σ: 397 a σ = 1,5, zero da σ = 4,0",
-                 loc="left", fontweight="bold")
-    salva(fig, "3_costo_per_sigma")
+# grafico 3 ----------------------------------------------------------------
+Z = "Z"   # costo nullo per ogni delta
+COL_ZERO = "#f0ebe8"
 
 
-# 4) Coppie di farmacie vicine in funzione di delta -----------------------
-def g4_coppie():
-    delta = [0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
-    coppie = [19, 88, 159, 234, 303, 344, 362, 373, 378]
-    fig, ax = plt.subplots(figsize=(9, 4.8))
-    ax.axvspan(2.0, 4.0, color=GRIGIO, alpha=0.25)
-    ax.text(2.05, 8, "δ* osservati: 2,0–4,0 km", color="#666666", fontsize=10)
-    ax.axhline(378, color="#888888", ls="--", lw=1)
-    ax.text(0.5, 384, "378 coppie: tutte (28 × 27 / 2)", color="#666666",
-            fontsize=10)
-    ax.plot(delta, coppie, "-o", color=BLU, lw=2.5)
-    for d, c in zip(delta, coppie):
-        ax.annotate(c, (d, c), textcoords="offset points",
-                    xytext=(0, 9) if c < 100 else (10, -14), ha="center")
-    ax.set_xticks(delta)
-    ax.set_xticklabels([it(d, 1) for d in delta])
-    ax.set_ylim(0, 410)
-    ax.set_xlabel("δ (km)")
-    ax.set_ylabel("Coppie a distanza ≤ δ (n_coppie_vicine)")
-    ax.set_title("Oltre δ = 4,5 km tutte le 378 coppie di farmacie sono «vicine»",
-                 loc="left", fontweight="bold")
-    salva(fig, "4_coppie_vicine_delta")
+def mappa_soglia(sol, D, sigmi):
+    """{sigma: {k: delta* | Z}}: delta* = ultimo delta a costo nullo prima
+    del primo costo positivo; Z se il costo e' nullo per ogni delta.
+    Le celle non ammissibili non compaiono."""
+    costo = {}
+    for (k, sg, d), r in sol.items():
+        if r["risolto"] and r["costo"] is not None:
+            costo[(k, sg, d)] = r["costo"]
+    for row in D.itertuples():
+        costo[(int(row.k), row.sigma, row.delta)] = min(
+            row.costo, costo.get((int(row.k), row.sigma, row.delta), row.costo))
+    celle = {}
+    for (k, sg, d), c in costo.items():
+        if sg in sigmi:
+            celle.setdefault((sg, k), {})[d] = c
+    mappa = {s: {} for s in sigmi}
+    for (sg, k), dd in celle.items():
+        pos = [d for d, c in dd.items() if c > 1e-9]
+        mappa[sg][k] = Z if not pos else max(d for d in dd if d < min(pos))
+    # k non eseguiti (nei dati mancano i k 21-23 per sigma < 3): se i due k
+    # vicini hanno la stessa soglia la cella e' completata con quel valore
+    for sg, riga in mappa.items():
+        ks = sorted(riga)
+        for a, b in zip(ks, ks[1:]):
+            if b - a > 1 and riga[a] == riga[b]:
+                for k in range(a + 1, b):
+                    riga[k] = riga[a]
+    return mappa
 
 
-# 5) Costo contro k a delta = 7,5 -----------------------------------------
-def g5_costo_k():
-    serie = {
-        "σ = 2,0": ([15, 30], [118.9, 111.1], GRIGIO),
-        "σ = 2,5": ([10, 15, 30], [121.4, 102.6, 94.1], "#8a8678"),
-        "σ = 3,0": ([5, 8, 10, 14, 15], [84.6, 47.3, 31.4, 6.3, 0], BLU),
-    }
-    fig, ax = plt.subplots(figsize=(9, 4.8))
-    for nome, (k, c, col) in serie.items():
-        ax.plot(k, c, "-o", color=col, lw=2.5, label=nome)
-        for kk, cc in zip(k, c):
-            ax.annotate(it(cc), (kk, cc), textcoords="offset points",
-                        xytext=(0, 8), ha="center", fontsize=9)
-        ax.text(k[-1] + 0.5, c[-1], nome, va="center", color=col,
-                fontweight="bold")
-    ax.set_xlim(0, 34)
-    ax.set_ylim(-5, 135)
-    ax.set_xlabel("k (turni)")
-    ax.set_ylabel("Costo a δ = 7,5")
-    ax.set_title("A σ = 3,0 il costo scende molto con k e si annulla da k = 15",
-                 loc="left", fontweight="bold")
-    fig.text(0.01, 0.005, "σ = 2,5, k = 10: 121,4 nei CSV (l’analisi riporta 121,7)",
-             fontsize=8, color="#666666")
-    salva(fig, "5_costo_vs_k")
+def g3_mappa(sol, D):
+    sigmi = [1.5, 2.0, 2.5, 3.0, 3.5]
+    mappa = mappa_soglia(sol, D, sigmi)
+    ks = sorted({k[0] for k in sol if k[0] >= 2 and k[0] <= 30})
+    vals = sorted({v for r in mappa.values() for v in r.values() if v != Z})
+    cmap = LinearSegmentedColormap.from_list(
+        "d", ["#0b7459", "#3f8a6c", "#6ca488", "#9bbfa9", "#c0d9cb"])
+    lo, hi = min(vals), max(vals)
+    fig, ax = plt.subplots(figsize=(11, 4.2))
+    for r, s in enumerate(sigmi):
+        for c, k in enumerate(ks):
+            v = mappa[s].get(k)
+            if v is None:
+                continue
+            col = COL_ZERO if v == Z else cmap((v - lo) / (hi - lo))
+            ax.add_patch(plt.Rectangle((c, r), 0.96, 0.96, color=col, lw=0))
+            if v != Z:
+                ax.text(c + 0.48, r + 0.48, it(v), ha="center", va="center", fontsize=6)
+    ax.set_xlim(-0.05, len(ks))
+    ax.set_ylim(len(sigmi), -0.1)
+    ax.xaxis.tick_top()
+    pari = [(c, k) for c, k in enumerate(ks) if k % 2 == 0]
+    ax.set_xticks([c + 0.5 for c, _ in pari])
+    ax.set_xticklabels([k for _, k in pari], fontsize=8)
+    ax.set_yticks([r + 0.5 for r in range(len(sigmi))])
+    ax.set_yticklabels([f"σ = {it(s)}" for s in sigmi], fontsize=8)
+    ax.tick_params(length=0)
+    for sp in ax.spines.values():
+        sp.set_visible(False)
+    ax.add_patch(plt.Rectangle((len(ks) / 2 - 3.2, len(sigmi) + 0.18), 0.7, 0.3,
+                               color=COL_ZERO, lw=0, clip_on=False))
+    ax.text(len(ks) / 2 - 2.2, len(sigmi) + 0.33, "costo nullo per ogni δ",
+            fontsize=7, va="center", clip_on=False)
+    salva(fig, "3_mappa_soglia_delta")
 
 
-# 6) Test finestra: costo contro s_giorni (sigma = 3, k = 10-15) ----------
-def g6_finestra():
-    s_giorni = [3, 5, 7, 10, 15]
-    pos = range(len(s_giorni))
-    d35 = [0, 1.458, 10.728, None, None]
-    d30 = [0, 0, 2.524, None, None]
-    fig, ax = plt.subplots(figsize=(9, 4.8))
-    ax.axvspan(2.5, 4.5, color=GRIGIO, alpha=0.25)
-    ax.text(3.5, 5.5, "non fattibile con σ = 3", ha="center", color="#666666")
-    for dati, nome, col, off in ((d35, "δ = 3,5", BLU, 9), (d30, "δ = 3,0", "#8a8678", -16)):
-        p = [i for i, v in zip(pos, dati) if v is not None]
-        v = [x for x in dati if x is not None]
-        ax.plot(p, v, "-o", color=col, lw=2.5)
-        for i, c in zip(p, v):
-            ax.annotate(it(c), (i, c), textcoords="offset points",
-                        xytext=(0, off), ha="center", fontsize=9)
-        ax.text(p[-1] + 0.1, v[-1], nome, color=col, fontweight="bold", va="center")
-    ax.set_xticks(list(pos))
-    ax.set_xticklabels(s_giorni)
-    ax.set_ylim(-1.5, 12)
-    ax.set_xlabel("s_giorni (giorni)")
-    ax.set_ylabel("Costo")
-    ax.set_title("Con σ = 3 il costo sale a 10,7 con s_giorni = 7; oltre non c’è soluzione",
-                 loc="left", fontweight="bold", fontsize=12)
-    fig.text(0.01, 0.005,
-             "k = 10–15 (a s_giorni = 7 e δ = 3,5 solo k = 15). "
-             "Fonte: risultati_test_finestra.csv", fontsize=8, color="#666666")
-    salva(fig, "6_finestra_costo_vs_s_giorni")
+# grafico 4 ----------------------------------------------------------------
+def g4_cadenza(sol):
+    tot_aperture = Counter()
+    for (k, sg, d), r in sol.items():
+        if r["risolto"] and r["costo"] and r["costo"] > 0 and k >= 3:
+            tot_aperture.update(r["aperture"])
+    totale = sum(tot_aperture.values())
+    farmacie = sorted(tot_aperture.items(), key=lambda x: (-x[1], x[0]))
+    quote = [c / totale * 100 for _, c in farmacie]
+    forti = [q >= 10 for q in quote]
+    n = len(farmacie)
+    nforti = sum(forti)
+    xmax = farmacie[0][1]
+    fig, ax = plt.subplots(figsize=(8, 4.2))
+    for i, ((nome, cnt), q) in enumerate(zip(farmacie, quote)):
+        ax.barh(i, cnt, height=0.62, color=VERDE if forti[i] else VERDE_CH)
+        ax.text(cnt + xmax * 0.012, i, f"{it(q, 1)}% · {cnt}", va="center",
+                fontsize=7, color="#555555")
+    ax.set_yticks(range(n))
+    ax.set_yticklabels([f[0] for f in farmacie], fontsize=7)
+    ax.invert_yaxis()
+    ax.set_xticks([])
+    ax.set_xlim(0, xmax * 1.4)
+    for sp in ("bottom", "top", "right"):
+        ax.spines[sp].set_visible(False)
+    ax.plot([xmax * 1.22] * 2, [-0.35, nforti - 0.65], color="#555555", lw=0.9)
+    ax.text(xmax * 1.27, (nforti - 1) / 2, f"{it(sum(q for q, f in zip(quote, forti) if f), 1)}%",
+            va="center", fontsize=7, color="#555555")
+    salva(fig, "4_cadenza_aperture")
+
+
+# grafico 5 ----------------------------------------------------------------
+def g5_coppie(coppie):
+    delta = list(coppie.index)
+    val = [int(c) for c in coppie.values]
+    top = max(val)
+    # fascia evidenziata e barre scure: delta in cui servono ancora nuove coppie
+    # (fino all'ultimo delta prima che compaiano tutte le coppie, + 0,5)
+    primo_tutte = delta[val.index(top)]
+    ultimo_forte = max(d for d in delta if d < primo_tutte)
+    inizio_fascia = delta[val.index(min(v for v in val if v >= top / 2))]
+    fig, ax = plt.subplots(figsize=(7.5, 3.9))
+    i0, i1 = delta.index(inizio_fascia), delta.index(ultimo_forte)
+    ax.axvspan(i0 - 0.45, i1 + 0.45, ymax=0.97, color="#e3f2ec", lw=0, zorder=0)
+    for i, (d, v) in enumerate(zip(delta, val)):
+        forte = d <= ultimo_forte
+        ax.bar(i, v, width=0.7, color=VERDE if forte else "#a1c4b5", zorder=2)
+        ax.text(i, v + 5, v, ha="center", fontsize=6.5,
+                color="#222222" if forte else "#777777")
+    ax.set_xticks(range(len(delta)))
+    ax.set_xticklabels([it(d, 1) for d in delta], fontsize=6.5, color="#555555")
+    ax.set_yticks([0, 100, 200, 300, top])
+    ax.tick_params(axis="y", labelsize=6.5, colors="#555555")
+    ax.set_ylim(0, top * 1.12)
+    ax.spines["left"].set_visible(False)
+    ax.spines["bottom"].set_color("#cccccc")
+    salva(fig, "5_coppie_vicine_delta")
 
 
 if __name__ == "__main__":
-    g1_esiti()
-    g2_k_minimo()
-    g3_costo_sigma()
-    g4_coppie()
-    g5_costo_k()
-    g6_finestra()
+    percorso = trova_dati()
+    D, coppie, n_righe = carica(percorso)
+    sol = carica_soluzioni(percorso)
+    g1_k_minimo(sol)
+    g2_costo_delta(D)
+    g3_mappa(sol, D)
+    g4_cadenza(sol)
+    g5_coppie(coppie)
     print("Fatto: grafici in", OUT.resolve())

@@ -17,7 +17,7 @@ s_turni: 30
 
 ! --- MATRICES ---
 
-! T_DIST: distanza quartiere q -> farmacia f (dati reali Ferrara)
+! T_DIST: distanza quartiere q -> farmacia f
 t_dist: [
     0.1183 0.9958 0.9326 2.2847 2.3092 2.9027 3.1620 1.4722
     1.3383 1.1711 1.9075 3.3954 2.5588 3.6048 3.7311 1.9373

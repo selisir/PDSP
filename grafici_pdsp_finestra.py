@@ -137,7 +137,7 @@ def g3_successo(df):
     salva(fig, "3_successo_pdsp")
 
 if __name__ == "__main__":
-    csv_file = sys.argv[1] if len(sys.argv) > 1 else "./test/risultati_test_finestra_2_integrati.csv"
+    csv_file = sys.argv[1] if len(sys.argv) > 1 else "./risultati_finestra/risultati_test_finestra_integrati.csv"
     print(f"Lettura dati da {csv_file} in corso...")
     df = carica_dati(csv_file)
     print("Creazione grafici...")

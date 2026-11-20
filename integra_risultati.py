@@ -15,9 +15,9 @@ import re
 import sys
 import pandas as pd
 
-csv_file = "risultati_test_finestra.csv"
-txt_file = "soluzioni_test_finestra.txt"
-output_file = "risultati_test_finestra_2_integrati.csv"
+csv_file = "./risultati_finestra/risultati_test_finestra.csv"
+txt_file = "./risultati_finestra/soluzioni_test_finestra.txt"
+output_file = "./risultati_finestra/risultati_test_finestra_integrati.csv"
 
 CHIAVE = ['k_turni', 's_giorni', 's_turni', 'sigma', 'delta']
 STATUS = {'2': 'Ottimo (2)', '4': 'Timeout (4)'}
